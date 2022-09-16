@@ -32,22 +32,14 @@ def detect_platform():
 def install_package(arch_package, deb_package, rpm_package):
     pkgmgmt = ""
     if Path("/usr/bin/pacman").exists():
-        pkgmgmt = "pacman"
+        os.system(f"pacman -S --noconfirm {arch_package}")
     elif Path("/usr/bin/apt").exists():
-        pkgmgmt = "apt"
+        os.system(f"apt install -y {deb_package}")
     elif Path("/usr/bin/dnf").exists():
-        pkgmgmt = "dnf"
+        os.system(f"dnf install -y {rpm_package}")
     else:
-        print("\033[31m" + "Unknown package manager!" + "\033[0m")
+        print("\033[31m" + f"Unknown package manager! Please install {deb_package} using your package manager." + "\033[0m")
         exit(1)
-    
-    match pkgmgmt:
-        case "pacman":
-            os.system(f"pacman -S --noconfirm {arch_package}")
-        case "apt":
-            os.system(f"apt install -y {deb_package}")
-        case "dnf":
-            os.system(f"dnf install -y {rpm_package}")
 
 if __name__ == "__main__":
 
