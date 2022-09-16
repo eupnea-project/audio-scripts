@@ -3,7 +3,6 @@
 from pathlib import Path
 import subprocess
 import os
-import boards
 import json
 
 def sklkbl_audio():
