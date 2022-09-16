@@ -23,7 +23,7 @@ def zen2_audio():
 
 def detect_platform():
     if Path("/usr/bin/dmidecode").exists():
-        board = subprocess.check_output("dmidecode -s system-product-name | tr '[:upper:]' '[:lower:]' | sed 's/ /_/g' | awk 'NR==1{print $1}'", shell=True, text=True).strip()
+        board = subprocess.check_output("dmidecode -s system-product-name", shell=True, text=True).strip().lower()
         return board
     else:
         print("dmidecode not installed")
