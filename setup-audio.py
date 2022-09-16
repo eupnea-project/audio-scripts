@@ -7,19 +7,19 @@ import boards
 import json
 
 def sklkbl_audio():
-    print("sklkbl")
+    print("sklkbl audio not implemented yet")
 
 def apl_audio():
-    print("apl")
+    print("apl  audio not implemented yet")
 
 def glkplus_audio():
-    print("glk+")
+    print("glk+  audio not implemented yet")
 
 def str_audio():
-    print("str")
+    print("str  audio not implemented yet")
 
 def zen2_audio():
-    print("zen2")
+    print("zen2  audio not implemented yet")
 
 def detect_platform():
     if Path("/usr/bin/dmidecode").exists():
@@ -74,3 +74,6 @@ if __name__ == "__main__":
             str_audio()
         case "zen2":
             zen2_audio()
+        case _:
+            print(""\033[31m" f"Unknown chromebook model: {board}" + "\033[0m"")
+            exit(1)
