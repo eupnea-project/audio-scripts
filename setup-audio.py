@@ -75,5 +75,5 @@ if __name__ == "__main__":
         case "zen2":
             zen2_audio()
         case _:
-            print(""\033[31m" f"Unknown chromebook model: {board}" + "\033[0m"")
+            print("\033[31m" f"Unknown chromebook model: {board}" + "\033[0m")
             exit(1)
