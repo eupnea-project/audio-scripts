@@ -9,16 +9,20 @@ def sklkbl_audio():
     print("sklkbl audio not implemented yet")
 
 def apl_audio():
-    print("apl  audio not implemented yet")
+    print("aplaudio not implemented yet")
 
-def glkplus_audio():
-    print("glk+  audio not implemented yet")
+def sof_audio():
+    install_package(sof-firmware, firmware-sof-signed, alsa-sof-firmware)
+    install_package(linux-firmware, linux-firmware, linux-firmware)
+    src = Path("sof.conf")
+    dst = Path("/etc/modprobe.d/sof.conf")
+    dst.write_bytes(src.read_bytes())
 
 def str_audio():
-    print("str  audio not implemented yet")
+    print("str audio not implemented yet")
 
 def zen2_audio():
-    print("zen2  audio not implemented yet")
+    print("zen2 audio not implemented yet")
 
 def detect_platform():
     if Path("/usr/bin/dmidecode").exists():
@@ -51,28 +55,31 @@ if __name__ == "__main__":
 
     with open("boards.json", "r") as file:
         boards = json.load(file)
-    
-    match boards[board]:
-        case "skl":
-            sklkbl_audio()
-        case "kbl":
-            sklkbl_audio()
-        case "apl":
-            apl_audio()
-        case "glk":
-            glkplus_audio()
-        case "whl":
-            glkplus_audio()
-        case "cml":
-            glkplus_audio()
-        case "jsl":
-            glkplus_audio()
-        case "tgl":
-            glkplus_audio()
-        case "str":
-            str_audio()
-        case "zen2":
-            zen2_audio()
-        case _:
-            print("\033[31m" f"Unknown chromebook model: {board}" + "\033[0m")
-            exit(1)
+    if board in boards:
+        match boards[board]:
+            case "skl":
+                sklkbl_audio()
+            case "kbl":
+                sklkbl_audio()
+            case "apl":
+                apl_audio()
+            case "glk":
+                sof_audio()
+            case "whl":
+                sof_audio()
+            case "cml":
+                sof_audio()
+            case "jsl":
+                sof_audio()
+            case "tgl":
+                sof_audio()
+            case "str":
+                str_audio()
+            case "zen2":
+                zen2_audio()
+            case _:
+                print("\033[31m" f"Unknown chromebook model: {board}" + "\033[0m")
+                exit(1)
+    else:
+        print("\033[31m" f"Unknown chromebook model: {board}" + "\033[0m")
+        exit(1)
