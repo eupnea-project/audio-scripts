@@ -12,8 +12,8 @@ def apl_audio():
     print("aplaudio not implemented yet")
 
 def sof_audio():
-    install_package(sof-firmware, firmware-sof-signed, alsa-sof-firmware)
-    install_package(linux-firmware, linux-firmware, linux-firmware)
+    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
+    install_package("linux-firmware", "linux-firmware", "linux-firmware")
     src = Path("sof.conf")
     dst = Path("/etc/modprobe.d/sof.conf")
     dst.write_bytes(src.read_bytes())
@@ -25,7 +25,7 @@ def zen2_audio():
     print("zen2 audio not implemented yet")
 
 def detect_platform():
-    if Path("/usr/bin/dmidecode").exists():
+    if Path("/usr/sbin/dmidecode").exists():
         board = subprocess.check_output("dmidecode -s system-product-name", shell=True, text=True).strip().lower()
         return board
     else:
