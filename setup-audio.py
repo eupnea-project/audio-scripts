@@ -45,11 +45,10 @@ def install_package(arch_package, deb_package, rpm_package):
         exit(1)
 
 if __name__ == "__main__":
-
-    if not os.getuid() == 0:
-        print(os.getuid())
-        print("\033[31m" + "This script needs to be run as root!!!" + "\033[0m")
-        exit(1)
+    # Elevate script to root
+    if not os.geteuid() == 0:
+        sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *sudo_args)
 
     board = detect_platform()
 
