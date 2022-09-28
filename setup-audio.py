@@ -14,7 +14,7 @@ def apl_audio():
 def sof_audio():
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
     install_package("linux-firmware", "linux-firmware", "linux-firmware")
-    src = Path("sof.conf")
+    src = Path("configs/sof.conf")
     dst = Path("/etc/modprobe.d/sof.conf")
     dst.write_bytes(src.read_bytes())
 
