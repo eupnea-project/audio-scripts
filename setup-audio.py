@@ -1,27 +1,36 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3
 
-from pathlib import Path
-import subprocess
 import os
+import sys
 import json
+import argparse
 
-def cpfile(srcf, dstf):
-    src = Path(srcf)
-    dst = Path(dstf)
-    dst.write_bytes(src.read_bytes())
+from functions import *
 
-def sklkbl_audio():
-    print("sklkbl audio not implemented yet")
+
+# parse arguments from the cli. Only for testing/advanced use. All other parameters are handled by cli_input.py
+def process_args():
+    parser = argparse.ArgumentParser()
+    # parser.add_argument('-l', '--local-path', dest="local_path",
+    #                     help="Use local files, instead of downloading from the internet (not recommended).")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
+                        help="Print more output")
+    return parser.parse_args()
+
+
+def skl_kbl_audio():
+    print_error("sklkbl audio not implemented yet")
+
 
 def apl_audio():
-    print("aplaudio not implemented yet")
+    print_error("aplaudio not implemented yet")
+
 
 def sof_audio(cpu, username):
     # Install required packages
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
     install_package("linux-firmware", "linux-firmware", "linux-firmware")
     install_package("pulseaudio", "pulseaudio", "pulseaudio")
-
 
     # Copy config files
     cpfile("configs/sof/audio-reload.service", "/etc/systemd/system/alsa-reload.service")
@@ -30,28 +39,31 @@ def sof_audio(cpu, username):
     cpfile("configs/sof/default.pa", "/etc/pulse/default.pa")
     cpfile("configs/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
 
-    # Extra commands
-    subprocess.run("systemctl daemon-reload")
-    subprocess.run("systemctl enable alsa-reload")
+    bash("systemctl daemon-reload")  # Reload systemd configs
+    bash("systemctl enable alsa-reload")  # enable custom service
 
-    # These commands need to be ran as a regular user
-    subprocess.run("su -c 'systemctl --user mask pipewire.{socket,service}' " + username)
-    subprocess.run("su -c 'systemctl --user unmask pulseaudio.{socket,service}' " + username)
-    subprocess.run("su -c 'systemctl --user enable pulseaudio.{socket,service}' " + username)
+    # These commands need to be run as a regular user
+    bash("su -c 'systemctl --user mask pipewire.{socket,service}' " + username)
+    bash("su -c 'systemctl --user unmask pulseaudio.{socket,service}' " + username)
+    bash("su -c 'systemctl --user enable pulseaudio.{socket,service}' " + username)
+
 
 def str_audio():
-    print("str audio not implemented yet")
+    print_error("str audio not implemented yet")
+
 
 def zen2_audio():
-    print("zen2 audio not implemented yet")
+    print_error("zen2 audio not implemented yet")
+
 
 def detect_platform():
     if Path("/usr/sbin/dmidecode").exists():
-        board = subprocess.check_output("dmidecode -s system-product-name", shell=True, text=True).strip().lower()
-        return board
+        return bash("dmidecode -s system-product-name").lower()
     else:
-        print("dmidecode not installed")
+        # TODO: Install dmidecode automatically
+        print_error("Please install dmidecode")
         exit(1)
+
 
 def install_package(arch_package, deb_package, rpm_package):
     if Path("/usr/bin/pacman").exists():
@@ -61,47 +73,58 @@ def install_package(arch_package, deb_package, rpm_package):
     elif Path("/usr/bin/dnf").exists():
         os.system(f"dnf install -y {rpm_package}")
     else:
-        print("\033[31m" + f"Unknown package manager! Please install {deb_package} using your package manager." + "\033[0m")
+        print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
         exit(1)
 
-if __name__ == "__main__":
-    # Get the username of the user running the script before elevating to root
-    username = os.getlogin()
 
-    # Elevate script to root
+if __name__ == "__main__":
+    if os.geteuid() == 0 and not path_exists("/tmp/username"):
+        print_error("Please start the script as non-root/without sudo")
+        exit(1)
+
+    args = process_args()  # process args before elevating to root for better ux
+
+    # Restart script as root
     if not os.geteuid() == 0:
+        # save username
+        with open("/tmp/username", "w") as file:
+            file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
-    board = detect_platform()
+    # read username
+    with open("/tmp/username", "r") as file:
+        user_id = file.read()
+
+    device_board = detect_platform()
 
     with open("boards.json", "r") as file:
         boards = json.load(file)
-    if board in boards:
-        match boards[board]:
+    try:
+        match boards[device_board]:
             case "skl":
-                sklkbl_audio()
+                skl_kbl_audio()
             case "kbl":
-                sklkbl_audio()
+                skl_kbl_audio()
             case "apl":
                 apl_audio()
             case "glk":
-                sof_audio("glk", username)
+                sof_audio("glk", user_id)
             case "whl":
-                sof_audio("whl", username)
+                sof_audio("whl", user_id)
             case "cml":
-                sof_audio("cml", username)
+                sof_audio("cml", user_id)
             case "jsl":
-                sof_audio("jsl", username)
+                sof_audio("jsl", user_id)
             case "tgl":
-                sof_audio("tgl", username)
+                sof_audio("tgl", user_id)
             case "str":
                 str_audio()
             case "zen2":
                 zen2_audio()
             case _:
-                print("\033[31m" f"Unknown chromebook model: {board}" + "\033[0m")
+                print_error(f"Unknown chromebook model: {device_board}")
                 exit(1)
-    else:
-        print("\033[31m" f"Unknown chromebook model: {board}" + "\033[0m")
+    except KeyError:
+        print_error(f"Unknown chromebook model: {device_board}")
         exit(1)
