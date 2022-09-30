@@ -13,7 +13,7 @@ def process_args():
     parser = argparse.ArgumentParser()
     # parser.add_argument('-l', '--local-path', dest="local_path",
     #                     help="Use local files, instead of downloading from the internet (not recommended).")
-    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=True,
                         help="Print more output")
     return parser.parse_args()
 
@@ -84,6 +84,9 @@ if __name__ == "__main__":
 
     args = process_args()  # process args before elevating to root for better ux
 
+    if args.verbose:
+        print_warning("Verbosity increased")
+        set_verbose(args.verbose)
     # Restart script as root
     if not os.geteuid() == 0:
         # save username
