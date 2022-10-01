@@ -33,11 +33,11 @@ def sof_audio(cpu, username):
     install_package("pulseaudio", "pulseaudio", "pulseaudio")
 
     # Copy config files
-    cpfile("configs/sof/alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
-    cpfile("configs/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
-    cpfile("configs/sof/asound.conf", "/etc/asound.conf")
-    cpfile("configs/sof/default.pa", "/etc/pulse/default.pa")
-    cpfile("configs/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
+    cpfile("configs/audio/sof/alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
+    cpfile("configs/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
+    cpfile("configs/audio/sof/asound.conf", "/etc/asound.conf")
+    cpfile("configs/audio/sof/default.pa", "/etc/pulse/default.pa")
+    cpfile("configs/audio/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
 
     bash("systemctl daemon-reload")  # Reload systemd configs
     bash("systemctl enable alsa-reload")  # enable custom service
