@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     device_board = detect_platform()
 
-    with open("boards.json", "r") as file:
+    with open("/etc/eupnea/audio/board-generations.json", "r") as file:
         boards = json.load(file)
     try:
         match boards[device_board]:
