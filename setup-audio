@@ -83,6 +83,7 @@ if __name__ == "__main__":
         exit(1)
 
     args = process_args()  # process args before elevating to root for better ux
+    # TODO: install universal dependencies before elevating to root
 
     # Restart script as root
     if not os.geteuid() == 0:
@@ -96,9 +97,14 @@ if __name__ == "__main__":
     rmfile("/tmp/.eupnea_root_ok")
 
     device_board = detect_platform()
+    
+    try:
+        with open("/etc/eupnea/audio/board-generations.json", "r") as file:
+            boards = json.load(file)
+    except FileNotFoundError:
+        with open("configs/board-generations.json", "r") as file: # For github repo clones
+            boards = json.load(file)
 
-    with open("/etc/eupnea/audio/board-generations.json", "r") as file:
-        boards = json.load(file)
     try:
         match boards[device_board]:
             case "skl":
