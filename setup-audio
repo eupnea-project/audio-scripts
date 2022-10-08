@@ -20,10 +20,12 @@ def process_args():
 
 def skl_kbl_audio():
     print_error("sklkbl audio not implemented yet")
+    print_error("Use this instead for now: https://github.com/cb-linux/breath/blob/main/bin/setup-audio")
 
 
 def apl_audio():
     print_error("aplaudio not implemented yet")
+    print_error("Use this instead for now: https://github.com/cb-linux/breath/blob/main/bin/apl-sof-setup-audio")
 
 
 def sof_audio(cpu, username):
@@ -98,6 +100,9 @@ if __name__ == "__main__":
     # read username
     with open("/tmp/username", "r") as file:
         user_id = file.read()
+
+    # Important message
+    print_warning("WARNING: this audio script is not fully functional yet!")
 
     device_board = detect_platform()
 
