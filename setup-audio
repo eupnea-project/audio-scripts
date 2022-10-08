@@ -102,7 +102,7 @@ if __name__ == "__main__":
         with open("/etc/eupnea/audio/board-generations.json", "r") as file:
             boards = json.load(file)
     except FileNotFoundError:
-        with open("configs/board-generations.json", "r") as file: # For github repo clones
+        with open("configs/audio/board-generations.json", "r") as file: # For github repo clones
             boards = json.load(file)
 
     try:
