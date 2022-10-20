@@ -45,9 +45,9 @@ def sof_audio(cpu, username):
     bash("systemctl enable alsa-reload")  # enable custom service
 
     # These commands need to be run as a regular user
-    bash("su -c 'systemctl --user mask pipewire.{socket,service}' " + username)
-    bash("su -c 'systemctl --user unmask pulseaudio.{socket,service}' " + username)
-    bash("su -c 'systemctl --user enable pulseaudio.{socket,service}' " + username)
+    bash("su -s '/bin/systemctl --user mask pipewire.{socket,service}' " + username)
+    bash("su -s '/bin/systemctl --user unmask pulseaudio.{socket,service}' " + username)
+    bash("su -s '/bin/systemctl --user enable pulseaudio.{socket,service}' " + username)
 
 
 def str_audio():
