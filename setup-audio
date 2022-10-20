@@ -80,23 +80,27 @@ def install_package(arch_package, deb_package, rpm_package):
 
 
 if __name__ == "__main__":
-    if os.geteuid() == 0 and not path_exists("/tmp/.eupnea_root_ok"):
+    if os.geteuid() == 0 and not path_exists("/tmp/username"):
         print_error("Please start the script as non-root/without sudo")
         exit(1)
 
     args = process_args()  # process args before elevating to root for better ux
     # TODO: install universal dependencies before elevating to root
 
+    if args.verbose:
+        print_warning("Verbosity increased")
+        set_verbose(args.verbose)
     # Restart script as root
     if not os.geteuid() == 0:
-        # create empty file to confirm script was started as non-root
-        with open("/tmp/.eupnea_root_ok", "w") as file:
-            file.write("")
+        # save username
+        with open("/tmp/username", "w") as file:
+            file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
-    # delete file to confirm script was started as root
-    rmfile("/tmp/.eupnea_root_ok")
+    # read username
+    with open("/tmp/username", "r") as file:
+        user_id = file.read()
 
     # Important message
     print_warning("WARNING: this audio script is not fully functional yet!")
