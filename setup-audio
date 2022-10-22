@@ -44,11 +44,13 @@ def sof_audio(cpu, username):
     bash("systemctl daemon-reload")  # Reload systemd configs
     bash("systemctl enable alsa-reload")  # enable custom service
 
-    # These commands need to be run as a regular user
-    bash("su -s '/bin/systemctl --user mask pipewire.{socket,service}' " + username)
-    bash("su -s '/bin/systemctl --user unmask pulseaudio.{socket,service}' " + username)
-    bash("su -s '/bin/systemctl --user enable pulseaudio.{socket,service}' " + username)
-
+    # Run a few systemctl commands as a regular user
+    try:
+        with open("/etc/eupnea/audio/sof/services.sh", "r"):
+            bash(f"su - {username} -s /etc/eupnea/audio/sof/services.sh")
+    except FileNotFoundError:
+        with open("configs/audio/sof/services.sh", "r"):
+            bash(f"su - {username} -s configs/audio/sof/services.sh")
 
 def str_audio():
     print_error("str audio not implemented yet")
