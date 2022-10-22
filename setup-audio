@@ -62,13 +62,8 @@ def zen2_audio():
 
 
 def detect_platform():
-    if Path("/usr/sbin/dmidecode").exists():
-        return bash("dmidecode -s system-product-name").lower()
-    else:
-        # TODO: Install dmidecode automatically
-        print_error("Please install dmidecode")
-        exit(1)
-
+    with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
+        return file.read().lower().strip()
 
 def install_package(arch_package, deb_package, rpm_package):
     if Path("/usr/bin/pacman").exists():
