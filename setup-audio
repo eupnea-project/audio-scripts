@@ -50,7 +50,8 @@ def sof_audio(cpu, username):
             bash(f"su - {username} -s /etc/eupnea/audio/sof/services.sh")
     except FileNotFoundError:
         with open("configs/audio/sof/services.sh", "r"):
-            bash(f"su - {username} -s configs/audio/sof/services.sh")
+            cwd = os.getcwd()
+            bash(f"su - {username} -s {cwd}/configs/audio/sof/services.sh")
 
 def str_audio():
     print_error("str audio not implemented yet")
