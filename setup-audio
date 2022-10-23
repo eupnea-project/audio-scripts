@@ -18,17 +18,17 @@ def process_args():
     return parser.parse_args()
 
 
-def skl_kbl_audio():
-    print_error("sklkbl audio not implemented yet")
-    print_error("Use this instead for now: https://github.com/cb-linux/breath/blob/main/bin/setup-audio")
+def avs_audio(platform):
+    # TODO: add support for avs
+    print_error("avs audio is not implemented yet!")
 
 
 def apl_audio():
-    print_error("aplaudio not implemented yet")
-    print_error("Use this instead for now: https://github.com/cb-linux/breath/blob/main/bin/apl-sof-setup-audio")
+    # TODO: add a selection to use either sof or avs
+    avs_audio("apl")
 
 
-def sof_audio(cpu, username):
+def sof_audio(platform, username):
     # Install required packages
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
     install_package("linux-firmware", "linux-firmware", "linux-firmware")
@@ -60,10 +60,6 @@ def str_audio():
 def zen2_audio():
     print_error("zen2 audio not implemented yet")
 
-
-def detect_platform():
-    with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
-        return file.read().lower().strip()
 
 def install_package(arch_package, deb_package, rpm_package):
     if Path("/usr/bin/pacman").exists():
@@ -103,7 +99,9 @@ if __name__ == "__main__":
     # Important message
     print_warning("WARNING: this audio script is not fully functional yet!")
 
-    device_board = detect_platform()
+    # Get the board name from dmi
+    with open("/sys/devices/virtual/dmi/id/product_name", "r") as dmi:
+        device_board = dmi.read().lower().strip()
     
     try:
         with open("/etc/eupnea/audio/board-generations.json", "r") as file:
@@ -115,9 +113,9 @@ if __name__ == "__main__":
     try:
         match boards[device_board]:
             case "skl":
-                skl_kbl_audio()
+                avs_audio("skl")
             case "kbl":
-                skl_kbl_audio()
+                avs_audio("skl")
             case "apl":
                 apl_audio()
             case "glk":
@@ -140,3 +138,4 @@ if __name__ == "__main__":
     except KeyError:
         print_error(f"Unknown chromebook model: {device_board}")
         exit(1)
+
