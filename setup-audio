@@ -133,9 +133,9 @@ if __name__ == "__main__":
             case "zen2":
                 zen2_audio()
             case _:
-                print_error(f"Unknown chromebook model: {device_board}")
+                print_error(f"Unknown/Unsupported chromebook model: {device_board}")
                 exit(1)
     except KeyError:
-        print_error(f"Unknown chromebook model: {device_board}")
+        print_error(f"Unknown/Unsupported chromebook model: {device_board}")
         exit(1)
 
