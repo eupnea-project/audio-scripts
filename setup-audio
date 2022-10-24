@@ -35,23 +35,19 @@ def sof_audio(platform, username):
     install_package("pulseaudio", "pulseaudio", "pulseaudio")
 
     # Copy config files
-    cpfile("configs/audio/sof/alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
-    cpfile("configs/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
-    cpfile("configs/audio/sof/asound.conf", "/etc/asound.conf")
-    cpfile("configs/audio/sof/default.pa", "/etc/pulse/default.pa")
-    cpfile("configs/audio/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
+    cpfile(f"{config_path}/audio/sof/alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
+    cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
+    cpfile(f"{config_path}/audio/sof/asound.conf", "/etc/asound.conf")
+    cpfile(f"{config_path}/audio/sof/default.pa", "/etc/pulse/default.pa")
+    cpfile(f"{config_path}/audio/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
 
     bash("systemctl daemon-reload")  # Reload systemd configs
     bash("systemctl enable alsa-reload")  # enable custom service
 
     # Run a few systemctl commands as a regular user
-    try:
-        with open("/etc/eupnea/audio/sof/services.sh", "r"):
-            bash(f"su - {username} -s /etc/eupnea/audio/sof/services.sh")
-    except FileNotFoundError:
-        with open("configs/audio/sof/services.sh", "r"):
-            cwd = os.getcwd()
-            bash(f"su - {username} -s {cwd}/configs/audio/sof/services.sh")
+    # TODO: Integrate the services.sh into this script
+    bash(f"su - {username} -s {config_path}/audio/sof/services.sh")
+
 
 def str_audio():
     print_error("str audio not implemented yet")
@@ -81,9 +77,6 @@ if __name__ == "__main__":
     args = process_args()  # process args before elevating to root for better ux
     # TODO: install universal dependencies before elevating to root
 
-    if args.verbose:
-        print_warning("Verbosity increased")
-        set_verbose(args.verbose)
     # Restart script as root
     if not os.geteuid() == 0:
         # save username
@@ -96,19 +89,25 @@ if __name__ == "__main__":
     with open("/tmp/username", "r") as file:
         user_id = file.read()
 
+    if args.verbose:
+        print_warning("Verbosity increased")
+        set_verbose(args.verbose)
+
     # Important message
     print_warning("WARNING: this audio script is not fully functional yet!")
+
+    # Determine if running from a git clone or a eupnea system
+    if path_exists("/etc/eupnea"):
+        config_path = "/etc/eupnea"
+    else:
+        config_path = "configs"
 
     # Get the board name from dmi
     with open("/sys/devices/virtual/dmi/id/product_name", "r") as dmi:
         device_board = dmi.read().lower().strip()
-    
-    try:
-        with open("/etc/eupnea/audio/board-generations.json", "r") as file:
-            boards = json.load(file)
-    except FileNotFoundError:
-        with open("configs/audio/board-generations.json", "r") as file: # For github repo clones
-            boards = json.load(file)
+
+    with open(f"{config_path}/audio/board-generations.json", "r") as file:
+        boards = json.load(file)
 
     try:
         match boards[device_board]:
@@ -138,4 +137,3 @@ if __name__ == "__main__":
     except KeyError:
         print_error(f"Unknown/Unsupported chromebook model: {device_board}")
         exit(1)
-
