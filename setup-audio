@@ -19,6 +19,7 @@ def process_args():
 
 
 def avs_audio(platform):
+    print_status("Installing AVS")
     # TODO: add support for avs
     print_error("avs audio is not implemented yet!")
 
@@ -29,6 +30,7 @@ def apl_audio():
 
 
 def sof_audio(platform, username):
+    print_status("Installing SOF")
     # Install required packages
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
     install_package("linux-firmware", "linux-firmware", "linux-firmware")
@@ -50,10 +52,12 @@ def sof_audio(platform, username):
 
 
 def str_audio():
+    print_status("Installing STR")
     print_error("str audio not implemented yet")
 
 
 def zen2_audio():
+    print_status("Installing zen2 audio")
     print_error("zen2 audio not implemented yet")
 
 
@@ -137,3 +141,8 @@ if __name__ == "__main__":
     except KeyError:
         print_error(f"Unknown/Unsupported chromebook model: {device_board}")
         exit(1)
+
+    print_header("Audio installed successfully!")
+    print_warning("REBOOTING IN 5 SECONDS... Press Ctrl+C to cancel")
+    sleep(5)
+    bash("reboot")
