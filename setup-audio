@@ -54,7 +54,22 @@ def str_audio():
 
 
 def zen2_audio():
-    print_error("zen2 audio not implemented yet")
+    # Find out if pipewire is installed
+    pactl = bash("pactl")
+    if not ("pipewire" in pactl):
+        install_package("pipewire","pipewire","pipewire-pulseaudio") # It is not tested  
+
+    # Prepare
+    mkdir("/tmp/audio")
+    bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/audio")
+    
+    # Copy
+    alsaucm = "/usr/share/alsa/ucm2"
+    mkdir(f"{alsaucm}/AMD/acp3xalc5682m98/",True)
+    cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf",f"{alsaucm}/AMD/acp3xalc5682m98/HiFi.conf")
+    cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",f"{alsaucm}/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+    mkdir(f"{alsaucm}/conf.d/acp3xalc5682m98",True)
+    bash(f"ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf {alsaucm}/conf.d/acp3xalc5682m98/acp3xalc5682m98.conf")
 
 
 def install_package(arch_package, deb_package, rpm_package):
