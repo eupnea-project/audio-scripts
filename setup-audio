@@ -69,7 +69,7 @@ def zen2_audio():
     cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf",f"{alsaucm}/AMD/acp3xalc5682m98/HiFi.conf")
     cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",f"{alsaucm}/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
     mkdir(f"{alsaucm}/conf.d/acp3xalc5682m98",True)
-    bash(f"ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf {alsaucm}/conf.d/acp3xalc5682m98/acp3xalc5682m98.conf")
+    bash(f"cd {alsaucm}/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
 
 
 def install_package(arch_package, deb_package, rpm_package):
