@@ -55,30 +55,31 @@ def str_audio():
 
 def zen2_audio():
     if not ("PipeWire" in pactl):
-        # Remove pulseaudio in ubuntu <= 22.04
-        # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
-        if path_exists("/usr/bin/apt"):
-            bash("apt-get install pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack -y")
-            bash("apt-get install wireplumber pipewire-media-session- -y")
-            cpfile(
-                "/usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/99-pipewire-default.conf")
-            cpfile(
-                "/usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf /etc/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf")
-            bash("ldconfig")  # auto-create links
-            bash("apt-get remove pulseaudio-module-bluetooth -y")
-            # TODO: auto run command as root
-            print_question("Please execute this command : " + "systemctl --user --now enable wireplumber.service")
-            input("Press enter after you executed the command")
-        elif Path("/usr/bin/pacman").exists():
-            pass
-        elif Path("/usr/bin/dnf").exists():
-            pass
-        else:
-            print_error(f"Something went REALLY WRONG : cannot install AMD audio => Open github issue <= ")
-            exit(1)
+        with open("/etc/eupnea.json") as conf:
+            distro = json.load(conf)["distro_name"]
+        match distro: # Remove pulseaudio in ubuntu <= 22.04
+            case "ubuntu":
+                # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
+                bash("apt-get install pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack -y")
+                bash("apt-get install wireplumber pipewire-media-session- -y")
+                cpfile(
+                    "/usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/99-pipewire-default.conf")
+                cpfile(
+                    "/usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf /etc/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf")
+                bash("ldconfig")  # auto-create links
+                bash("apt-get remove pulseaudio-module-bluetooth -y")
+                # TODO: auto run command as root
+                print_question("Please execute this command : " + "systemctl --user --now enable wireplumber.service")
+                input("Press enter after you executed the command")
+            case "arch":
+                pass
+            case "fedora":
+                pass
+            case _:
+                print_error(f"Something went REALLY WRONG : cannot install AMD audio => Open github issue <= ")
+                exit(1)
 
     # Prepare
-    mkdir("/tmp/audio")
     bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/audio")
 
     # Copy
@@ -104,7 +105,9 @@ def install_package(arch_package, deb_package, rpm_package):
 
 
 if __name__ == "__main__":
-    pactl = bash("pactl info")  # pactl must run as not root
+    mkdir("/tmp/audio")
+    with open("/tmp/audio/pactl") as file:
+        file.write(bash("pactl info"))  # pactl must run as not root
 
     if os.geteuid() == 0 and not path_exists("/tmp/username"):
         print_error("Please start the script as non-root/without sudo")
