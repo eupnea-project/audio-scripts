@@ -54,10 +54,10 @@ def str_audio():
 
 
 def zen2_audio():
-    with open("/tmp/audio/pactl") as file:
+    with open("/tmp/audio/pactl","r") as file:
         pactl=file.read()  # pactl must run as not root
     if not ("PipeWire" in pactl):
-        with open("/etc/eupnea.json") as conf:
+        with open("/etc/eupnea.json","r") as conf:
             distro = json.load(conf)["distro_name"]
         match distro: # Remove pulseaudio in ubuntu <= 22.04
             case "ubuntu":
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     # Restart script as root
     if not os.geteuid() == 0:
         mkdir("/tmp/audio")
-        with open("/tmp/audio/pactl") as file:
+        with open("/tmp/audio/pactl","w") as file:
             file.write(bash("pactl info"))  # pactl must run as not root
         # save username
         with open("/tmp/username", "w") as file:
