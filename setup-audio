@@ -54,6 +54,8 @@ def str_audio():
 
 
 def zen2_audio():
+    with open("/tmp/audio/pactl") as file:
+        pactl=file.read()  # pactl must run as not root
     if not ("PipeWire" in pactl):
         with open("/etc/eupnea.json") as conf:
             distro = json.load(conf)["distro_name"]
@@ -105,10 +107,6 @@ def install_package(arch_package, deb_package, rpm_package):
 
 
 if __name__ == "__main__":
-    mkdir("/tmp/audio")
-    with open("/tmp/audio/pactl") as file:
-        file.write(bash("pactl info"))  # pactl must run as not root
-
     if os.geteuid() == 0 and not path_exists("/tmp/username"):
         print_error("Please start the script as non-root/without sudo")
         exit(1)
@@ -118,6 +116,9 @@ if __name__ == "__main__":
 
     # Restart script as root
     if not os.geteuid() == 0:
+        mkdir("/tmp/audio")
+        with open("/tmp/audio/pactl") as file:
+            file.write(bash("pactl info"))  # pactl must run as not root
         # save username
         with open("/tmp/username", "w") as file:
             file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
