@@ -54,22 +54,32 @@ def str_audio():
 
 
 def zen2_audio():
-    # Find out if pipewire is installed
-    pactl = bash("pactl")
-    if not ("pipewire" in pactl):
-        install_package("pipewire","pipewire","pipewire-pulseaudio") # It is not tested  
-
-    # Prepare
-    mkdir("/tmp/audio")
-    bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/audio")
-    
-    # Copy
-    alsaucm = "/usr/share/alsa/ucm2"
-    mkdir(f"{alsaucm}/AMD/acp3xalc5682m98/",True)
-    cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf",f"{alsaucm}/AMD/acp3xalc5682m98/HiFi.conf")
-    cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",f"{alsaucm}/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
-    mkdir(f"{alsaucm}/conf.d/acp3xalc5682m98",True)
-    bash(f"cd {alsaucm}/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+    if not Path(".audio").exists(): # First setup
+        if not ("PipeWire" in pactl):
+            # For ubuntu (<=22.04): 
+            if Path("/usr/bin/apt").exists(): # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
+                bash("apt-get install pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack -y")
+                bash("apt-get install wireplumber pipewire-media-session- -y")
+                cpfile("/usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/99-pipewire-default.conf")
+                cpfile("/usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf /etc/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf")
+                bash("ldconfig")
+                bash("apt-get remove pulseaudio-module-bluetooth -y")
+                bash("touch .audio")
+                # A command as non root "systemctl --user --now enable wireplumber.service"
+            # install_package("pipewire","pipewire-pulseaudio") # It is not tested  
+    else:
+        rmfile(".audio")
+        # Prepare
+        mkdir("/tmp/audio")
+        bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/audio")
+        
+        # Copy
+        alsaucm = "/usr/share/alsa/ucm2"
+        mkdir(f"{alsaucm}/AMD/acp3xalc5682m98/",True)
+        cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf",f"{alsaucm}/AMD/acp3xalc5682m98/HiFi.conf")
+        cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",f"{alsaucm}/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+        mkdir(f"{alsaucm}/conf.d/acp3xalc5682m98",True)
+        bash(f"cd {alsaucm}/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
 
 
 def install_package(arch_package, deb_package, rpm_package):
@@ -85,6 +95,11 @@ def install_package(arch_package, deb_package, rpm_package):
 
 
 if __name__ == "__main__":
+    pactl = bash("pactl info") # pactl must run as not root
+    if Path(".audio").exists():
+        bash("systemctl --user --now enable wireplumber.service")
+    
+    
     if os.geteuid() == 0 and not path_exists("/tmp/username"):
         print_error("Please start the script as non-root/without sudo")
         exit(1)
