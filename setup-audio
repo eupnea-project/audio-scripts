@@ -80,6 +80,8 @@ def zen2_audio():
                 pass
             case "fedora":
                 pass
+            case "debian":
+                pass
             case _:
                 print_error(f"Something went REALLY WRONG : cannot install AMD audio => Open github issue <= ")
                 exit(1)
