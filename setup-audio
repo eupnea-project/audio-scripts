@@ -142,7 +142,7 @@ if __name__ == "__main__":
         print_error(f"Unknown/Unsupported chromebook model: {device_board}")
         exit(1)
 
-    print_header("Audio installed successfully!")
-    print_warning("REBOOTING IN 5 SECONDS... Press Ctrl+C to cancel")
-    sleep(5)
+    print_header("Audio installed successfully! Reboot to enable audio.")
+    input("\033[92m" + "Press ENTER to reboot or CTRL+C to cancel reboot" + "\033[0m")
     bash("reboot")
+    sleep(5)
