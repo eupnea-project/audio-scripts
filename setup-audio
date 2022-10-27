@@ -63,7 +63,7 @@ def zen2_audio():
             cpfile("/usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf /etc/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf")
             bash("ldconfig")
             bash("apt-get remove pulseaudio-module-bluetooth -y")
-            #bash("systemctl --user --now enable wireplumber.service")
+            input("Please execute this command : "+"systemctl --user --now enable wireplumber.service")
             # A command as non root "systemctl --user --now enable wireplumber.service"
             print_warning("Your device is going to reboot in 6s : Press Ctrl+C to cancel ...")
             sleep(6)
