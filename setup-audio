@@ -65,6 +65,7 @@ def zen2_audio():
             distro = json.load(conf)["distro_name"]
         match distro: # Remove pulseaudio in ubuntu <= 22.04
             case "ubuntu":
+                bash("apt-get update") # If wasn't initialized before.
                 # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
                 bash("apt-get install pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack -y")
                 bash("apt-get install wireplumber pipewire-media-session- -y")
@@ -80,7 +81,11 @@ def zen2_audio():
                 print_question("Please execute this command : " + "systemctl --user --now enable wireplumber.service")
                 input("Press enter after you executed the command")
             case "arch":
-                pass
+                bash("pacman -Syy") # If wasn't initialized before.
+                bash("pacman -S pipewire-pulse")
+                # TODO: auto run command as root
+                print_question("Please execute this command : " + "systemctl --user --now enable pipewire-pulse.service")
+                input("Press enter after you executed the command")
             case "debian":
                 pass
             case _:
