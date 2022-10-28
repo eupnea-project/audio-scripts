@@ -69,9 +69,11 @@ def zen2_audio():
                 bash("apt-get install pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack -y")
                 bash("apt-get install wireplumber pipewire-media-session- -y")
                 cpfile(
-                    "/usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/99-pipewire-default.conf")
+                    "/usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf",
+                    "/etc/alsa/conf.d/99-pipewire-default.conf")
                 cpfile(
-                    "/usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf /etc/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf")
+                    "/usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf",
+                    "/etc/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf")
                 bash("ldconfig")  # auto-create links
                 bash("apt-get remove pulseaudio-module-bluetooth -y")
                 # TODO: auto run command as root
