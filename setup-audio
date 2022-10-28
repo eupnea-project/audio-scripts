@@ -59,6 +59,7 @@ def str_audio():
 def zen2_audio():
     with open("/tmp/audio/pactl","r") as file:
         pactl=file.read()  # pactl must run as not root
+    rmfile("/tmp/audio/pactl")
     if not ("PipeWire" in pactl):
         with open("/etc/eupnea.json","r") as conf:
             distro = json.load(conf)["distro_name"]
