@@ -81,8 +81,6 @@ def zen2_audio():
                 input("Press enter after you executed the command")
             case "arch":
                 pass
-            case "fedora":
-                pass
             case "debian":
                 pass
             case _:
