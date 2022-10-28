@@ -97,6 +97,8 @@ def zen2_audio():
 
     # Copy
     alsaucm = "/usr/share/alsa/ucm2"
+    if path_exists(alsaucm+"/AMD"): # The distro is already up-to-date (ArchLinux)
+        return 0
     mkdir(f"{alsaucm}/AMD/acp3xalc5682m98/", True)
     cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf", f"{alsaucm}/AMD/acp3xalc5682m98/HiFi.conf")
     cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",
