@@ -57,6 +57,7 @@ def str_audio():
 
 
 def zen2_audio():
+    print_status("Installing zen2 audio")
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
