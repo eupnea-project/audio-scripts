@@ -34,21 +34,21 @@ def sof_audio(platform, username):
     # Install required packages
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
     install_package("linux-firmware", "linux-firmware", "linux-firmware")
-    install_package("pulseaudio", "pulseaudio", "pulseaudio")
+    #install_package("pulseaudio", "pulseaudio", "pulseaudio")
 
     # Copy config files
-    cpfile(f"{config_path}/audio/sof/alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
+    #cpfile(f"{config_path}/audio/sof/alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
-    cpfile(f"{config_path}/audio/sof/asound.conf", "/etc/asound.conf")
-    cpfile(f"{config_path}/audio/sof/default.pa", "/etc/pulse/default.pa")
-    cpfile(f"{config_path}/audio/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
+    #cpfile(f"{config_path}/audio/sof/asound.conf", "/etc/asound.conf")
+    #cpfile(f"{config_path}/audio/sof/default.pa", "/etc/pulse/default.pa")
+    #cpfile(f"{config_path}/audio/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
 
-    bash("systemctl daemon-reload")  # Reload systemd configs
-    bash("systemctl enable alsa-reload")  # enable custom service
+    #bash("systemctl daemon-reload")  # Reload systemd configs
+    #bash("systemctl enable alsa-reload")  # enable custom service
 
     # Run a few systemctl commands as a regular user
     # TODO: Integrate the services.sh into this script
-    bash(f"su - {username} -s {config_path}/audio/sof/services.sh")
+    #bash(f"su - {username} -s {config_path}/audio/sof/services.sh")
 
 
 def str_audio():
