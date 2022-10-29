@@ -46,9 +46,10 @@ def sof_audio(platform, username):
     # bash("systemctl daemon-reload")  # Reload systemd configs
     # bash("systemctl enable alsa-reload")  # enable custom service
 
-    # Run a few systemctl commands as a regular user
-    # TODO: Integrate the services.sh into this script
-    # bash(f"su - {username} -s {config_path}/audio/sof/services.sh")
+    # Run systemctl commands as a regular user
+    # bash(f"systemctl --machine={username}@.host --user mask pipewire.{socket,service}")
+    # bash(f"systemctl --machine={username}@.host --user unmask pulseaudio.{socket,service}")
+    # bash(f"systemctl --machine={username}@.host --user enable pulseaudio.{socket,service}")
 
 
 def str_audio():
@@ -65,10 +66,8 @@ def zen2_audio():
         if Path("/usr/bin/pacman").exists():
             bash("pacman -Syy --noconfirm")  # Sync repos
             bash("pacman -S --noconfirm pipewire-pulse")  # install pipewire
-            # TODO: auto run command as root
-            print_question("Please execute this command in another terminal window: systemctl --user --now enable "
-                           "wireplumber.service")
-            input("Press enter after you executed the command")
+            bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
+
         elif path_exists("/usr/bin/apt"):
             with open("/etc/os-release", "r") as file:
                 os_release = file.read().lower()
@@ -87,10 +86,9 @@ def zen2_audio():
                        "/etc/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf")
                 bash("ldconfig")  # auto-create links
 
-                # TODO: auto run command as root
-                print_question("Please execute this command in another terminal window: systemctl --user --now enable "
-                               "wireplumber.service")
-                input("Press enter after you executed the command")
+                # enable wireplumber
+                bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")
+
             elif "debian gnu/linux 11 (bullseye)" in os_release:
                 # https://trendoceans.com/install-pipewire-on-debian-11/
                 bash("sudo apt-get update")  # Update repos
@@ -100,12 +98,13 @@ def zen2_audio():
                        "/etc/systemd/user/pipewire-pulse.service")
                 cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.socket",
                        "/etc/systemd/user/pipewire-pulse.socket")
-                print_question("Please execute these commands in a separate terminal (ONE BY ONE):\n"
-                               "systemctl --user daemon-reload\n"
-                               "systemctl --user --now disable pulseaudio.service pulseaudio.socket\n"
-                               "systemctl --user --now enable pipewire pipewire-pulse\n"
-                               "systemctl --user mask pulseaudio")
-                input("Press enter after you executed the commands")
+
+                bash(f"systemctl --machine={username}@.host --user daemon-reload")  # Reload systemd configs
+                # fully disable pulseaudio
+                bash(f"systemctl --machine={username}@.host --user --now disable pulseaudio.service pulseaudio.socket")
+                bash(f"systemctl --machine={username}@.host --user mask pulseaudio")
+                # enable pipewire
+                bash(f"systemctl --machine={username}@.host --user --now enable pipewire pipewire-pulse")
         else:
             print_error(f"Something went wrong => open a github issue or create a post on the discord\nError: Distro "
                         f"not recognized (zen2 audio)")
