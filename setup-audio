@@ -87,7 +87,19 @@ def zen2_audio():
                 print_question("Please execute this command : " + "systemctl --user --now enable pipewire-pulse.service")
                 input("Press enter after you executed the command")
             case "debian":
-                pass
+                # https://trendoceans.com/install-pipewire-on-debian-11/
+                bash("sudo apt-get install -y pipewire pipewire-audio-client-libraries")
+                open("/etc/pipewire/media-session.d/with-pulseaudio", 'a').close() # create an empty file
+                cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.service",
+                    "/etc/systemd/user/pipewire-pulse.service")
+                cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.socket",
+                    "/etc/systemd/user/pipewire-pulse.socket")
+                print_question("Please execute this command (ONE BY ONE):\n"
+                "systemctl --user daemon-reload\n"
+                "systemctl --user --now disable pulseaudio.service pulseaudio.socket\n"
+                "systemctl --user --now enable pipewire pipewire-pulse\n"
+                "systemctl --user mask pulseaudio")
+                input("Press enter after you executed the command")
             case _:
                 print_error(f"Something went REALLY WRONG : cannot install AMD audio => Open github issue <= ")
                 exit(1)
