@@ -73,8 +73,8 @@ def zen2_audio():
                 os_release = file.read().lower()
             if "ubuntu 22.04" in os_release:  # Remove pulseaudio and install pipewire on ubuntu 22.04
                 # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
-                bash("apt install -y pipewire pipewire-pulse")
                 bash("apt-get update")  # Update repos
+                bash("apt install -y pipewire pipewire-pulse")
                 bash("apt-get remove -y pulseaudio-module-bluetooth")  # Remove pulseaudio bluetooth module
                 bash("apt-get install -y pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack "
                      "wireplumber pipewire-media-session-")
