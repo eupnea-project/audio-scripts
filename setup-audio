@@ -57,8 +57,68 @@ def str_audio():
 
 
 def zen2_audio():
-    print_status("Installing zen2 audio")
-    print_error("zen2 audio not implemented yet")
+    with open("/tmp/audio/pactl","r") as file:
+        pactl=file.read()  # pactl must run as not root
+    rmfile("/tmp/audio/pactl")
+    if not ("PipeWire" in pactl):
+        with open("/etc/eupnea.json","r") as conf:
+            distro = json.load(conf)["distro_name"]
+        match distro: # Remove pulseaudio in ubuntu <= 22.04
+            case "ubuntu":
+                bash("apt-get update") # If wasn't initialized before.
+                # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
+                bash("apt-get install pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack -y")
+                bash("apt-get install wireplumber pipewire-media-session- -y")
+                cpfile(
+                    "/usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf",
+                    "/etc/alsa/conf.d/99-pipewire-default.conf")
+                cpfile(
+                    "/usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf",
+                    "/etc/ld.so.conf.d/pipewire-jack-x86_64-linux-gnu.conf")
+                bash("ldconfig")  # auto-create links
+                bash("apt-get remove pulseaudio-module-bluetooth -y")
+                # TODO: auto run command as root
+                print_question("Please execute this command : " + "systemctl --user --now enable wireplumber.service")
+                input("Press enter after you executed the command")
+            case "arch":
+                bash("pacman -Syy --noconfirm") # If wasn't initialized before.
+                bash("pacman -S --noconfirm pipewire-pulse")
+                # TODO: auto run command as root
+                print_question("Please execute this command : " + "systemctl --user --now enable pipewire-pulse.service")
+                input("Press enter after you executed the command")
+            case "debian":
+                # https://trendoceans.com/install-pipewire-on-debian-11/
+                bash("sudo apt-get update") # If wasn't initialized before.
+                bash("sudo apt-get install -y pipewire pipewire-audio-client-libraries")
+                open("/etc/pipewire/media-session.d/with-pulseaudio", 'a').close() # create an empty file
+                cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.service",
+                    "/etc/systemd/user/pipewire-pulse.service")
+                cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.socket",
+                    "/etc/systemd/user/pipewire-pulse.socket")
+                print_question("Please execute this command (ONE BY ONE):\n"
+                "systemctl --user daemon-reload\n"
+                "systemctl --user --now disable pulseaudio.service pulseaudio.socket\n"
+                "systemctl --user --now enable pipewire pipewire-pulse\n"
+                "systemctl --user mask pulseaudio")
+                input("Press enter after you executed the command")
+            case _:
+                print_error(f"Something went wrong => open github issue here :"
+                " https://github.com/eupnea-linux/audio-scripts"
+                "\nError : Distro not recognize (zen2 audio)")
+                exit(1)
+
+    alsaucm = "/usr/share/alsa/ucm2"
+    if path_exists(alsaucm+"/AMD"): # The distro is already up-to-date (ArchLinux):
+        # Prepare
+        bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/audio")
+
+        # Copy
+        mkdir(f"{alsaucm}/AMD/acp3xalc5682m98/", True)
+        cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf", f"{alsaucm}/AMD/acp3xalc5682m98/HiFi.conf")
+        cpfile("/tmp/audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",
+            f"{alsaucm}/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+        mkdir(f"{alsaucm}/conf.d/acp3xalc5682m98", True)
+        bash(f"cd {alsaucm}/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
 
 
 def install_package(arch_package, deb_package, rpm_package):
@@ -83,6 +143,9 @@ if __name__ == "__main__":
 
     # Restart script as root
     if not os.geteuid() == 0:
+        mkdir("/tmp/audio")
+        with open("/tmp/audio/pactl","w") as file:
+            file.write(bash("pactl info"))  # pactl must run as not root
         # save username
         with open("/tmp/username", "w") as file:
             file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
