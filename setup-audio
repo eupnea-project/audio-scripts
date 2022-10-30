@@ -34,6 +34,7 @@ def sof_audio(platform, username):
     # Install required packages
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
     install_package("linux-firmware", "linux-firmware", "linux-firmware")
+    install_package("alsa-utils", "alsa-utils", "alsa-utils")
     # install_package("pulseaudio", "pulseaudio", "pulseaudio")
 
     # Copy config files
@@ -59,6 +60,7 @@ def str_audio():
 
 def zen2_audio():
     print_status("Installing zen2 audio")
+    install_package("alsa-utils", "alsa-utils", "alsa-utils")
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
