@@ -58,7 +58,7 @@ def str_audio():
     print_error("str audio not implemented yet")
 
 
-def zen2_audio():
+def zen2_audio(username):
     print_status("Installing zen2 audio")
     install_package("alsa-utils", "alsa-utils", "alsa-utils")
     with open("/tmp/eupnea-audio/pactl", "r") as file:
@@ -113,7 +113,7 @@ def zen2_audio():
             exit(1)
 
     alsaucm = "/usr/share/alsa/ucm2"
-    if path_exists(alsaucm + "/AMD"):  # The distro is already up-to-date (ArchLinux):
+    if not path_exists(alsaucm + "/AMD"):  # The distro is already up-to-date (ArchLinux):
         # Prepare
         bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/eupnea-audio")
 
@@ -202,7 +202,7 @@ if __name__ == "__main__":
             case "str":
                 str_audio()
             case "zen2":
-                zen2_audio()
+                zen2_audio(user_id)
             case _:
                 print_error(f"Unknown/Unsupported chromebook model: {device_board}")
                 exit(1)
