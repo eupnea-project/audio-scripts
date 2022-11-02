@@ -32,9 +32,10 @@ def apl_audio():
 def sof_audio(platform, username):
     print_status("Installing SOF")
     # Install required packages
-    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
-    install_package("linux-firmware", "linux-firmware", "linux-firmware")
-    install_package("alsa-utils", "alsa-utils", "alsa-utils")
+    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "R") # Sof firmware needs to be reinstalled for some reason.
+    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "I")
+    install_package("linux-firmware", "linux-firmware", "linux-firmware", "I")
+    install_package("alsa-utils", "alsa-utils", "alsa-utils", "I")
     # install_package("pulseaudio", "pulseaudio", "pulseaudio")
 
     # Copy config files
@@ -60,7 +61,7 @@ def str_audio():
 
 def zen2_audio(username):
     print_status("Installing zen2 audio")
-    install_package("alsa-utils", "alsa-utils", "alsa-utils")
+    install_package("alsa-utils", "alsa-utils", "alsa-utils", "I")
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
@@ -126,16 +127,39 @@ def zen2_audio(username):
         bash(f"cd {alsaucm}/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
 
 
-def install_package(arch_package, deb_package, rpm_package):
-    if Path("/usr/bin/pacman").exists():
-        bash(f"pacman -S --noconfirm {arch_package}")
-    elif Path("/usr/bin/apt").exists():
-        bash(f"apt install -y {deb_package}")
-    elif Path("/usr/bin/dnf").exists():
-        bash(f"dnf install -y {rpm_package}")
-    else:
-        print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
-        exit(1)
+def install_package(arch_package, deb_package, rpm_package, operation):
+    match operation:
+        case "I": # Install
+            if Path("/usr/bin/pacman").exists():
+                bash(f"pacman -S --noconfirm {arch_package}")
+            elif Path("/usr/bin/apt").exists():
+                bash(f"apt install -y {deb_package}")
+            elif Path("/usr/bin/dnf").exists():
+                bash(f"dnf install -y {rpm_package}")
+            else:
+                print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
+                exit(1)
+         case "R": # Remove
+            if Path("/usr/bin/pacman").exists():
+                bash(f"pacman -Rsn --noconfirm {arch_package}")
+            elif Path("/usr/bin/apt").exists():
+                bash(f"apt remove -y {deb_package}")
+            elif Path("/usr/bin/dnf").exists():
+                bash(f"dnf remove -y {rpm_package}")
+            else:
+                print_error(f"Unknown package manager! Please remove {deb_package} using your package manager.")
+                exit(1)
+        case "U": # Update
+            if Path("/usr/bin/pacman").exists():
+                bash(f"pacman -Syu")
+            elif Path("/usr/bin/apt").exists():
+                bash(f"apt update; apt upgrade -y")
+            elif Path("/usr/bin/dnf").exists():
+                bash(f"dnf upgrade -y")
+            else:
+                print_error(f"Unknown package manager! Please update using your package manager.")
+                exit(1)
+
 
 
 if __name__ == "__main__":
