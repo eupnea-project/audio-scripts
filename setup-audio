@@ -32,10 +32,10 @@ def apl_audio():
 def sof_audio(platform, username):
     print_status("Installing SOF")
     # Install required packages
-    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "R") # Sof firmware needs to be reinstalled for some reason.
-    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "I")
-    install_package("linux-firmware", "linux-firmware", "linux-firmware", "I")
-    install_package("alsa-utils", "alsa-utils", "alsa-utils", "I")
+    install_package("R", "sof-firmware", "firmware-sof-signed", "alsa-sof-firmware") # Sof firmware needs to be reinstalled for some reason.
+    install_package("I", "sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
+    install_package("I", "linux-firmware", "linux-firmware", "linux-firmware")
+    install_package("I", "alsa-utils", "alsa-utils", "alsa-utils")
     # install_package("pulseaudio", "pulseaudio", "pulseaudio")
 
     # Copy config files
@@ -61,7 +61,7 @@ def str_audio():
 
 def zen2_audio(username):
     print_status("Installing zen2 audio")
-    install_package("alsa-utils", "alsa-utils", "alsa-utils", "I")
+    install_package("I", "alsa-utils", "alsa-utils", "alsa-utils")
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
@@ -127,7 +127,7 @@ def zen2_audio(username):
         bash(f"cd {alsaucm}/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
 
 
-def install_package(arch_package, deb_package, rpm_package, operation):
+def install_package(operation, arch_package="", deb_package="", rpm_package=""):
     match operation:
         case "I": # Install
             if Path("/usr/bin/pacman").exists():
