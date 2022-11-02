@@ -139,7 +139,7 @@ def install_package(arch_package, deb_package, rpm_package, operation):
             else:
                 print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
                 exit(1)
-         case "R": # Remove
+        case "R": # Remove
             if Path("/usr/bin/pacman").exists():
                 bash(f"pacman -Rsn --noconfirm {arch_package}")
             elif Path("/usr/bin/apt").exists():
