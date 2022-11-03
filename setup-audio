@@ -68,7 +68,8 @@ def zen2_audio(username):
     if not ("PipeWire" in pactl):
         if Path("/usr/bin/pacman").exists():
             bash("pacman -Syy --noconfirm")  # Sync repos
-            bash("pacman -S --noconfirm pipewire-pulse")  # install pipewire
+            bash("pacman -S --noconfirm wireplumber")
+            bash("pacman -S pipewire-pulse | echo 'y'")  # install pipewire
             bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
 
         elif path_exists("/usr/bin/apt"):
