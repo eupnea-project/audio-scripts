@@ -187,7 +187,7 @@ if __name__ == "__main__":
     # Restart script as root
     if not os.geteuid() == 0:
 
-        # Script as regular user
+        # Script as regular user (zen2 stuff)
         mkdir("/tmp/eupnea-audio")
         with open("/tmp/eupnea-audio/pactl", "w") as file:
             try: # error on xfce
@@ -251,7 +251,7 @@ if __name__ == "__main__":
             case "str":
                 str_audio()
             case "zen2":
-                # Install pulseaudio-utils
+                # Install pulseaudio-utils if not already install
                 with open("/tmp/eupnea-audio/pactl", "r") as file:
                     pactl = file.read()
                 if pactl == "nopactl":
