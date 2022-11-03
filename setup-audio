@@ -68,7 +68,7 @@ def zen2_audio(username):
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
-    if not ("PipeWire" in pactl):
+    if not ("PipeWire" in pactl) and not args.assume:
         
         if Path("/usr/bin/pacman").exists():
             #bash("pacman -S --noconfirm wireplumber")
