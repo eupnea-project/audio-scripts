@@ -266,9 +266,9 @@ if __name__ == "__main__":
                     if args.assume or dassume:
                         print_warning("Assuming that this package isn't installed, skip ...")
                     else:
+                        rmfile("/tmp/eupnea-audio/pactl")
                         print_question("Attempt to install pulseaudio-utils (pactl)? (y/n)")
                         if input() in ["y","Y","yes"]:
-                            rmfile("/tmp/eupnea-audio/pactl")
                             install_package("U")
                             install_package("I","libpulse","pulseaudio-utils","pulseaudio-utils")
                             print_status("Please restart the script (run 'setup-audio')") # pactl must be run by regular user
