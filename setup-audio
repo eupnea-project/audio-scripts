@@ -81,7 +81,8 @@ def zen2_audio(username):
         if Path("/usr/bin/pacman").exists():
             #bash("pacman -S --noconfirm wireplumber")
             # install pipewire by wireplumber provider and yes erease pulse-audio
-            bash("pacman -S pipewire-pulse | echo '2'| echo 'y'")
+            print_warning("Please accept any further transaction. (enter '1','y','y','y')")
+            bash("pacman -S pipewire-pulse")
             # Enable/start pipewire
             bash(f"systemctl --machine={username}@.host --user enable pipewire.service")
             bash(f"systemctl --machine={username}@.host --user start pipewire.service")
