@@ -15,6 +15,16 @@ def process_args():
     #                     help="Use local files, instead of downloading from the internet (not recommended).")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=True,
                         help="Print more output")
+
+    # Determine distro (somtime pactl ins't required):
+    with open("/etc/os-release", "r") as file:
+        os_release = file.read().lower()
+    if "ubuntu 22.10" in os_release:
+        dassume = True
+    else:
+        dassume = False
+    parser.add_argument("-a", "-assume", action="store_true", dest="assume", default=dassume,
+                        help="Assume that some package aren't installed, no exit prevention")
     return parser.parse_args()
 
 
@@ -66,15 +76,24 @@ def zen2_audio(username):
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
     if not ("PipeWire" in pactl):
+        
         if Path("/usr/bin/pacman").exists():
             bash("pacman -Syy --noconfirm")  # Sync repos
-            bash("pacman -S --noconfirm wireplumber")
-            bash("pacman -S pipewire-pulse | echo 'y'")  # install pipewire
-            bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
+            #bash("pacman -S --noconfirm wireplumber")
+            # install pipewire by wireplumber provider and yes erease pulse-audio
+            bash("pacman -S pipewire-pulse | echo '2'| echo 'y'")
+            # Enable/start pipewire
+            bash(f"systemctl --machine={username}@.host --user enable pipewire.service")
+            bash(f"systemctl --machine={username}@.host --user start pipewire.service")
+            # Enable/start pipewire-pulse
+            bash(f"systemctl --machine={username}@.host --user enable pipwire-pulse.service")
+            bash(f"systemctl --machine={username}@.host --user start pipwire-pulse.service")
+            #bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
 
         elif path_exists("/usr/bin/apt"):
             with open("/etc/os-release", "r") as file:
                 os_release = file.read().lower()
+            
             if "ubuntu 22.04" in os_release:  # Remove pulseaudio and install pipewire on ubuntu 22.04
                 # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
                 bash("apt-get update")  # Update repos
@@ -171,11 +190,28 @@ if __name__ == "__main__":
     args = process_args()  # process args before elevating to root for better ux
     # TODO: install universal dependencies before elevating to root
 
+    if args.assume:
+        print_warning("Assume argument enable")
+
     # Restart script as root
     if not os.geteuid() == 0:
         mkdir("/tmp/eupnea-audio")
         with open("/tmp/eupnea-audio/pactl", "w") as file:
-            file.write(bash("pactl info"))  # pactl must run as not root
+            if path_exists("/usr/bin/pactl"):
+                info = bash("pactl info") # pactl might not always be installed => install it
+                file.write(info)  # pactl must run as not root
+            else:
+                print_warning("pulse-audio utils is not installed,")
+                if args.assume:
+                    print_warning("Assuming that this package isn't installed, skip ...")
+                    file.write("")
+                else:
+                    print_question("Attempt to install pulse-audio utils (pactl)? (y/n)")
+                    if input() in ["y","Y","yes"]:
+                        file.write("install") # cannot install without root
+                    else:
+                        print_error("pactl must be install for zen2 audio !")
+                        exit(1)
         # save username
         with open("/tmp/username", "w") as file:
             file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
