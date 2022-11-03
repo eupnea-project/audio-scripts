@@ -24,7 +24,7 @@ def process_args():
     else:
         dassume = False
     parser.add_argument("-a", "-assume", action="store_true", dest="assume", default=dassume,
-                        help="Assume that some package aren't installed, no exit prevention")
+                        help="Assume that some package aren't installed, disable : force exit, package installation")
     return parser.parse_args()
 
 
@@ -71,6 +71,7 @@ def str_audio():
 
 def zen2_audio(username):
     print_status("Installing zen2 audio")
+    install_package("U")
     install_package("I", "alsa-utils", "alsa-utils", "alsa-utils")
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
@@ -78,7 +79,6 @@ def zen2_audio(username):
     if not ("PipeWire" in pactl):
         
         if Path("/usr/bin/pacman").exists():
-            bash("pacman -Syy --noconfirm")  # Sync repos
             #bash("pacman -S --noconfirm wireplumber")
             # install pipewire by wireplumber provider and yes erease pulse-audio
             bash("pacman -S pipewire-pulse | echo '2'| echo 'y'")
@@ -96,7 +96,6 @@ def zen2_audio(username):
             
             if "ubuntu 22.04" in os_release:  # Remove pulseaudio and install pipewire on ubuntu 22.04
                 # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
-                bash("apt-get update")  # Update repos
                 bash("apt install -y pipewire pipewire-pulse")
                 bash("apt-get remove -y pulseaudio-module-bluetooth")  # Remove pulseaudio bluetooth module
                 bash("apt-get install -y pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack "
@@ -114,7 +113,6 @@ def zen2_audio(username):
 
             elif "debian gnu/linux 11 (bullseye)" in os_release:
                 # https://trendoceans.com/install-pipewire-on-debian-11/
-                bash("sudo apt-get update")  # Update repos
                 bash("sudo apt-get install -y pipewire pipewire-audio-client-libraries")
                 open("/etc/pipewire/media-session.d/with-pulseaudio", 'a').close()  # create an empty file
                 cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.service",
@@ -195,18 +193,20 @@ if __name__ == "__main__":
 
     # Restart script as root
     if not os.geteuid() == 0:
+
+        # Script as regular user
         mkdir("/tmp/eupnea-audio")
         with open("/tmp/eupnea-audio/pactl", "w") as file:
-            if path_exists("/usr/bin/pactl"):
+            try: # Prevent other errors
                 info = bash("pactl info") # pactl might not always be installed => install it
                 file.write(info)  # pactl must run as not root
-            else:
-                print_warning("pulse-audio utils is not installed,")
+            except:
+                print_warning("pulseaudio-utils is not installed,")
                 if args.assume:
                     print_warning("Assuming that this package isn't installed, skip ...")
                     file.write("")
                 else:
-                    print_question("Attempt to install pulse-audio utils (pactl)? (y/n)")
+                    print_question("Attempt to install pulseaudio-utils (pactl)? (y/n)")
                     if input() in ["y","Y","yes"]:
                         file.write("install") # cannot install without root
                     else:
@@ -263,7 +263,17 @@ if __name__ == "__main__":
             case "str":
                 str_audio()
             case "zen2":
-                zen2_audio(user_id)
+                # Install pulseaudio-utils
+                with open("/tmp/eupnea-audio/pactl", "r") as file:
+                    pactl = file.read()
+                if pactl == "install":
+                    rmfile("/tmp/eupnea-audio/pactl")
+                    install_package("U")
+                    install_package("I","libpulse","pulseaudio-utils","pulseaudio-utils")
+                    print_status("Please restart the script (run 'setup-audio')")
+                    exit(0)
+                else:
+                    zen2_audio(user_id)
             case _:
                 print_error(f"Unknown/Unsupported chromebook model: {device_board}")
                 exit(1)
