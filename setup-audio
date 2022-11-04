@@ -297,14 +297,14 @@ if __name__ == "__main__":
                         "I", "libpulse", "pulseaudio-utils", "pulseaudio-utils")
                     # pactl must be run by regular user
                     print_status(
-                        "Please restart the script (run 'setup-audio')")
+                        "Please restart the script (run 'setup-audio') [installed pactl]")
                     exit(0)
                 elif pactl == "nopulse":
                     install_package("U")
                     install_package("I", "pulseaudio",
                                     "pulseaudio", "pulseaudio")
                     print_status(
-                        "Please restart the script (run 'setup-audio')")
+                        "Please restart the script (run 'setup-audio') [installed pulseaudio]")
                     exit(0)
 
                 else:
