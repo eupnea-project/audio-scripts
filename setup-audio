@@ -15,6 +15,8 @@ def process_args():
     #                     help="Use local files, instead of downloading from the internet (not recommended).")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=True,
                         help="Print more output")
+    parser.add_argument("-d", "--debug", action="store_true", dest="debug", default=False,
+                        help="Debug purpose, might do nothing for final user")
     return parser.parse_args()
 
 
@@ -32,15 +34,19 @@ def apl_audio():
 def sof_audio(platform, username):
     print_status("Installing SOF")
     # Install required packages
-    install_package("R", "sof-firmware", "firmware-sof-signed", "alsa-sof-firmware") # Sof firmware needs to be reinstalled for some reason.
-    install_package("I", "sof-firmware", "firmware-sof-signed", "alsa-sof-firmware")
+    # Sof firmware needs to be reinstalled for some reason.
+    install_package("R", "sof-firmware",
+                    "firmware-sof-signed", "alsa-sof-firmware")
+    install_package("I", "sof-firmware",
+                    "firmware-sof-signed", "alsa-sof-firmware")
     install_package("I", "linux-firmware", "linux-firmware", "linux-firmware")
     install_package("I", "alsa-utils", "alsa-utils", "alsa-utils")
     # install_package("pulseaudio", "pulseaudio", "pulseaudio")
 
     # Copy config files
     # cpfile(f"{config_path}/audio/sof/alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
-    cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
+    cpfile(f"{config_path}/audio/sof/alsa-sof.conf",
+           "/etc/modprobe.d/alsa-sof.conf")
     # cpfile(f"{config_path}/audio/sof/asound.conf", "/etc/asound.conf")
     # cpfile(f"{config_path}/audio/sof/default.pa", "/etc/pulse/default.pa")
     # cpfile(f"{config_path}/audio/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
@@ -61,24 +67,39 @@ def str_audio():
 
 def zen2_audio(username):
     print_status("Installing zen2 audio")
-    install_package("I", "alsa-utils", "alsa-utils", "alsa-utils")
+    install_package("U")
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
     if not ("PipeWire" in pactl):
+
         if Path("/usr/bin/pacman").exists():
-            bash("pacman -Syy --noconfirm")  # Sync repos
-            bash("pacman -S --noconfirm pipewire-pulse")  # install pipewire
-            bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
+            #bash("pacman -S --noconfirm wireplumber")
+            # install pipewire by wireplumber provider and yes erease pulse-audio
+            print_warning(
+                "Please accept any further transaction. (enter '1','y','y','y')")
+            bash("pacman -S pipewire-pulse")
+            # Enable/start pipewire
+            bash(
+                f"systemctl --machine={username}@.host --user enable pipewire.service")
+            bash(
+                f"systemctl --machine={username}@.host --user start pipewire.service")
+            # Enable/start pipewire-pulse
+            bash(
+                f"systemctl --machine={username}@.host --user enable pipwire-pulse.service")
+            bash(
+                f"systemctl --machine={username}@.host --user start pipwire-pulse.service")
+            # bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
 
         elif path_exists("/usr/bin/apt"):
             with open("/etc/os-release", "r") as file:
                 os_release = file.read().lower()
-            if "ubuntu 22.04" in os_release:  # Remove pulseaudio and install pipewire on ubuntu 22.04
+
+            if "ubuntu" in os_release:  # Remove pulseaudio and install pipewire on ubuntu 22.04 or 22.10
                 # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
-                bash("apt-get update")  # Update repos
                 bash("apt install -y pipewire pipewire-pulse")
-                bash("apt-get remove -y pulseaudio-module-bluetooth")  # Remove pulseaudio bluetooth module
+                # Remove pulseaudio bluetooth module
+                bash("apt-get remove -y pulseaudio-module-bluetooth")
                 bash("apt-get install -y pipewire-audio-client-libraries libspa-0.2-bluetooth libspa-0.2-jack "
                      "wireplumber pipewire-media-session-")
 
@@ -90,46 +111,66 @@ def zen2_audio(username):
                 bash("ldconfig")  # auto-create links
 
                 # enable wireplumber
-                bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")
+                bash(
+                    f"systemctl --machine={username}@.host --user --now enable wireplumber.service")
 
             elif "debian gnu/linux 11 (bullseye)" in os_release:
                 # https://trendoceans.com/install-pipewire-on-debian-11/
-                bash("sudo apt-get update")  # Update repos
                 bash("sudo apt-get install -y pipewire pipewire-audio-client-libraries")
-                open("/etc/pipewire/media-session.d/with-pulseaudio", 'a').close()  # create an empty file
+                open("/etc/pipewire/media-session.d/with-pulseaudio",
+                     'a').close()  # create an empty file
                 cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.service",
                        "/etc/systemd/user/pipewire-pulse.service")
                 cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.socket",
                        "/etc/systemd/user/pipewire-pulse.socket")
 
-                bash(f"systemctl --machine={username}@.host --user daemon-reload")  # Reload systemd configs
+                # Reload systemd configs
+                bash(
+                    f"systemctl --machine={username}@.host --user daemon-reload")
                 # fully disable pulseaudio
-                bash(f"systemctl --machine={username}@.host --user --now disable pulseaudio.service pulseaudio.socket")
-                bash(f"systemctl --machine={username}@.host --user mask pulseaudio")
+                bash(
+                    f"systemctl --machine={username}@.host --user --now disable pulseaudio.service pulseaudio.socket")
+                bash(
+                    f"systemctl --machine={username}@.host --user mask pulseaudio")
                 # enable pipewire
-                bash(f"systemctl --machine={username}@.host --user --now enable pipewire pipewire-pulse")
+                bash(
+                    f"systemctl --machine={username}@.host --user --now enable pipewire pipewire-pulse")
         else:
             print_error(f"Something went wrong => open a github issue or create a post on the discord\nError: Distro "
                         f"not recognized (zen2 audio)")
             exit(1)
 
     alsaucm = "/usr/share/alsa/ucm2"
-    if not path_exists(alsaucm + "/AMD"):  # The distro is already up-to-date (ArchLinux):
+    # The distro is already up-to-date (ArchLinux):
+    if not path_exists(alsaucm + "/AMD"):
         # Prepare
         bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/eupnea-audio")
 
         # Copy
         mkdir(f"{alsaucm}/AMD/acp3xalc5682m98/", True)
-        cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf", f"{alsaucm}/AMD/acp3xalc5682m98/HiFi.conf")
+        cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf",
+               f"{alsaucm}/AMD/acp3xalc5682m98/HiFi.conf")
         cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",
                f"{alsaucm}/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
         mkdir(f"{alsaucm}/conf.d/acp3xalc5682m98", True)
-        bash(f"cd {alsaucm}/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+        bash(
+            f"cd {alsaucm}/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+
+
+def post_misc() -> None:
+    """
+    Perform misc operation to fix sound\n
+    Global to every devices
+    """
+    # Xfce sound mixer
+    de = bash("echo $XDG_CURRENT_DESKTOP")
+    if de == "XFCE":
+        install_package("I","xfce4-pulseaudio-plugin","xfce4-pulseaudio-plugin","xfce4-pulseaudio-plugin")
 
 
 def install_package(operation, arch_package="", deb_package="", rpm_package=""):
     match operation:
-        case "I": # Install
+        case "I":  # Install
             if Path("/usr/bin/pacman").exists():
                 bash(f"pacman -S --noconfirm {arch_package}")
             elif Path("/usr/bin/apt").exists():
@@ -137,9 +178,10 @@ def install_package(operation, arch_package="", deb_package="", rpm_package=""):
             elif Path("/usr/bin/dnf").exists():
                 bash(f"dnf install -y {rpm_package}")
             else:
-                print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
+                print_error(
+                    f"Unknown package manager! Please install {deb_package} using your package manager.")
                 exit(1)
-        case "R": # Remove
+        case "R":  # Remove
             if Path("/usr/bin/pacman").exists():
                 bash(f"pacman -Rsn --noconfirm {arch_package}")
             elif Path("/usr/bin/apt").exists():
@@ -147,9 +189,10 @@ def install_package(operation, arch_package="", deb_package="", rpm_package=""):
             elif Path("/usr/bin/dnf").exists():
                 bash(f"dnf remove -y {rpm_package}")
             else:
-                print_error(f"Unknown package manager! Please remove {deb_package} using your package manager.")
+                print_error(
+                    f"Unknown package manager! Please remove {deb_package} using your package manager.")
                 exit(1)
-        case "U": # Update
+        case "U":  # Update
             if Path("/usr/bin/pacman").exists():
                 bash(f"pacman -Syu")
             elif Path("/usr/bin/apt").exists():
@@ -157,9 +200,9 @@ def install_package(operation, arch_package="", deb_package="", rpm_package=""):
             elif Path("/usr/bin/dnf").exists():
                 bash(f"dnf upgrade -y")
             else:
-                print_error(f"Unknown package manager! Please update using your package manager.")
+                print_error(
+                    f"Unknown package manager! Please update using your package manager.")
                 exit(1)
-
 
 
 if __name__ == "__main__":
@@ -170,14 +213,28 @@ if __name__ == "__main__":
     args = process_args()  # process args before elevating to root for better ux
     # TODO: install universal dependencies before elevating to root
 
+    if args.debug:
+        print_warning("debug argument enable")
+
     # Restart script as root
     if not os.geteuid() == 0:
+
+        # Script as regular user (zen2 stuff)
         mkdir("/tmp/eupnea-audio")
         with open("/tmp/eupnea-audio/pactl", "w") as file:
-            file.write(bash("pactl info"))  # pactl must run as not root
+            try:  # error on xfce
+                if path_exists("/usr/bin/pactl"):
+                    # pactl might not always be installed => install it
+                    info = bash("pactl info")
+                    file.write(info)  # pactl must run as not root
+                else:
+                    file.write("nopactl")
+            except:
+                file.write("nopulse")
         # save username
         with open("/tmp/username", "w") as file:
-            file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
+            # get non root username. os.getlogin() seems to fail in chroots
+            file.write(bash("whoami").strip())
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
@@ -226,15 +283,50 @@ if __name__ == "__main__":
             case "str":
                 str_audio()
             case "zen2":
-                zen2_audio(user_id)
+                # Install pulseaudio-utils if not already install
+                with open("/tmp/eupnea-audio/pactl", "r") as file:
+                    pactl = file.read()
+                if pactl == "nopactl":
+                    print_warning(
+                        "pulseaudio-utils is not installed, installing it !")
+                    rmfile("/tmp/eupnea-audio/pactl")
+                    install_package("U")
+                    install_package("I", "alsa-utils",
+                                    "alsa-utils", "alsa-utils")
+                    install_package(
+                        "I", "libpulse", "pulseaudio-utils", "pulseaudio-utils")
+                    # pactl must be run by regular user
+                    print_status(
+                        "Please restart the script (run 'setup-audio') [installed pactl]")
+                    exit(0)
+                elif pactl == "nopulse":
+                    install_package("U")
+                    install_package("I", "pulseaudio",
+                                    "pulseaudio", "pulseaudio")
+                    print_status(
+                        "Please your device need to reboot to complete installation,"
+                        "then rexecute this script (run 'setup-audio') [installed pulseaudio]")
+                    input("\033[92m" +
+                          "Press ENTER to reboot or CTRL+C to cancel reboot" + "\033[0m")
+                    bash("reboot")
+                    sleep(5)
+                    exit(0)
+
+                else:
+                    zen2_audio(user_id)
             case _:
-                print_error(f"Unknown/Unsupported chromebook model: {device_board}")
+                print_error(
+                    f"Unknown/Unsupported chromebook model: {device_board}")
                 exit(1)
     except KeyError:
         print_error(f"Unknown/Unsupported chromebook model: {device_board}")
         exit(1)
 
+    # Perform misc operation
+    post_misc()
+
     print_header("Audio installed successfully! Reboot to enable audio.")
-    input("\033[92m" + "Press ENTER to reboot or CTRL+C to cancel reboot" + "\033[0m")
+    input("\033[92m" +
+          "Press ENTER to reboot or CTRL+C to cancel reboot" + "\033[0m")
     bash("reboot")
     sleep(5)
