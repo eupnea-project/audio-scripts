@@ -247,7 +247,7 @@ if __name__ == "__main__":
         with open("/sys/devices/virtual/dmi/id/product_name", "r") as dmi:
             device_board = dmi.read().lower().strip()
     else:  # use the board name from the args, for testing only
-        device_board = args.board.lower().strip()
+        device_board = args.board_name.lower().strip()
 
     with open(f"{config_path}/audio/board-generations.json", "r") as file:
         boards = json.load(file)
