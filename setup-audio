@@ -304,7 +304,12 @@ if __name__ == "__main__":
                     install_package("I", "pulseaudio",
                                     "pulseaudio", "pulseaudio")
                     print_status(
-                        "Please restart the script (run 'setup-audio') [installed pulseaudio]")
+                        "Please your device need to reboot to complete installation,"
+                        "then rexecute this script (run 'setup-audio') [installed pulseaudio]")
+                    input("\033[92m" +
+                          "Press ENTER to reboot or CTRL+C to cancel reboot" + "\033[0m")
+                    bash("reboot")
+                    sleep(5)
                     exit(0)
 
                 else:
