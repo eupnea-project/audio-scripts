@@ -124,20 +124,26 @@ def zen2_audio(username):
             print_error(f"Something went wrong => open a github issue or create a post on the discord\nError: Distro "
                         f"not recognized (zen2 audio)")
             exit(1)
+    else:
+        print_status("PipeWire is already configured")
 
-    # Copy ucms, if not already present
-    if not path_exists("/usr/share/alsa/ucm2/AMD"):
-        # Prepare
-        bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/eupnea-audio")
+    # remove old files
+    rmdir("/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/")
+    rmfile("/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98")
 
-        # Copy
-        mkdir("/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/", True)
-        cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf",
-               "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/HiFi.conf")
-        cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",
-               "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
-        mkdir("/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98", True)
-        bash("cd /usr/share/alsa/ucm2/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+    # clone repo
+    bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/eupnea-audio")
+
+    # Make directories
+    mkdir("/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/", create_parents=True)
+    mkdir("/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98", create_parents=True)
+
+    # copy ucm configs
+    cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf",
+           "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/HiFi.conf")
+    cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",
+           "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+    bash("cd /usr/share/alsa/ucm2/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
 
 
 def post_misc() -> None:
