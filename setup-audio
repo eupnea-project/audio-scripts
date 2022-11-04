@@ -15,7 +15,7 @@ def process_args():
     #                     help="Use local files, instead of downloading from the internet (not recommended).")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=True,
                         help="Print more output")
-    parser.add_argument("-a", "-assume", action="store_true", dest="assume", default=False,
+    parser.add_argument("-a", "--assume", action="store_true", dest="assume", default=False,
                         help="Assume that some package aren't installed, disable : force exit, package installation")
     return parser.parse_args()
 
@@ -196,9 +196,10 @@ if __name__ == "__main__":
                 else:
                     file.write("nopactl")
             except:
-                print_error("Something went wrong try re-run 'setup' in tty console [ctrl + alt + F3]\n"
-                "/!\ keys are loaded in english")
-                exit(1)
+                if not args.assume:
+                    print_error("Something went wrong try re-run 'setup' in tty console [ctrl + alt + F3]\n"
+                    "/!\ keys are loaded in english")
+                    exit(1)
         # save username
         with open("/tmp/username", "w") as file:
             file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
