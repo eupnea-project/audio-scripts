@@ -232,7 +232,7 @@ if __name__ == "__main__":
     else:
         config_path = "configs"
 
-    if args.board_name == "":
+    if args.board_name[0] == "":
         # Get the board name from dmi
         with open("/sys/devices/virtual/dmi/id/product_name", "r") as dmi:
             device_board = dmi.read().lower().strip()
