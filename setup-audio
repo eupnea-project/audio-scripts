@@ -165,7 +165,7 @@ def post_misc() -> None:
     # Xfce sound mixer
     de = bash("echo $XDG_CURRENT_DESKTOP")
     if de == "XFCE":
-        install_package("xfce4-pulseaudio-plugin")
+        install_package("I","xfce4-pulseaudio-plugin","xfce4-pulseaudio-plugin","xfce4-pulseaudio-plugin")
 
 
 def install_package(operation, arch_package="", deb_package="", rpm_package=""):
