@@ -15,8 +15,8 @@ def process_args():
     #                     help="Use local files, instead of downloading from the internet (not recommended).")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=True,
                         help="Print more output")
-    parser.add_argument("-a", "--assume", action="store_true", dest="assume", default=False,
-                        help="Assume that some package aren't installed, disable : force exit, package installation")
+    parser.add_argument("-d", "--debug", action="store_true", dest="assume", default=False,
+                        help="Debug purpose, might do nothing for final user")
     return parser.parse_args()
 
 
@@ -230,10 +230,7 @@ if __name__ == "__main__":
                 else:
                     file.write("nopactl")
             except:
-                if not args.assume:
-                    print_error("Something went wrong try re-run 'setup' in tty console [ctrl + alt + F3]\n"
-                                "/!\ keys are loaded in english")
-                    exit(1)
+                file.write("nopulse")
         # save username
         with open("/tmp/username", "w") as file:
             # get non root username. os.getlogin() seems to fail in chroots
@@ -290,28 +287,26 @@ if __name__ == "__main__":
                 with open("/tmp/eupnea-audio/pactl", "r") as file:
                     pactl = file.read()
                 if pactl == "nopactl":
-                    print_warning("pulseaudio-utils is not installed,")
-                    if args.assume:
-                        print_warning(
-                            "Assuming that this package isn't installed, skip ...")
-                    else:
-                        rmfile("/tmp/eupnea-audio/pactl")
-                        print_question(
-                            "Attempt to install pulseaudio-utils (pactl)? (y/n)")
-                        if input() in ["y", "Y", "yes"]:
-                            install_package("U")
-                            install_package("I", "alsa-utils",
-                                            "alsa-utils", "alsa-utils")
-                            install_package(
-                                "I", "libpulse", "pulseaudio-utils", "pulseaudio-utils")
-                            # pactl must be run by regular user
-                            print_status(
-                                "Please restart the script (run 'setup-audio')")
-                            exit(0)
-                        else:
-                            print_error(
-                                "pactl must be install for zen2 audio !")
-                            exit(1)
+                    print_warning(
+                        "pulseaudio-utils is not installed, installing it !")
+                    rmfile("/tmp/eupnea-audio/pactl")
+                    install_package("U")
+                    install_package("I", "alsa-utils",
+                                    "alsa-utils", "alsa-utils")
+                    install_package(
+                        "I", "libpulse", "pulseaudio-utils", "pulseaudio-utils")
+                    # pactl must be run by regular user
+                    print_status(
+                        "Please restart the script (run 'setup-audio')")
+                    exit(0)
+                elif pactl == "nopulse":
+                    install_package("U")
+                    install_package("I", "pulseaudio",
+                                    "pulseaudio", "pulseaudio")
+                    print_status(
+                        "Please restart the script (run 'setup-audio')")
+                    exit(0)
+
                 else:
                     zen2_audio(user_id)
             case _:
