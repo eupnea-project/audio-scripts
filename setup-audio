@@ -129,7 +129,7 @@ def zen2_audio(username):
 
     # remove old files
     rmdir("/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/")
-    rmfile("/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98")
+    rmdir("/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98")
 
     # clone repo
     bash("git clone https://github.com/alsa-project/alsa-ucm-conf/ /tmp/eupnea-audio")
