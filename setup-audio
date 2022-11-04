@@ -66,10 +66,7 @@ def str_audio():
 def zen2_audio(username):
     print_status("Installing zen2 audio")
     update_system()
-    with open("/tmp/eupnea-audio/pactl", "r") as file:
-        pactl = file.read()  # pactl was run at the start as non-root
-    rmfile("/tmp/eupnea-audio/pactl")
-    if not ("PipeWire" in pactl):
+    if not bash("ps -e | grep pipewire").__contains__("pipewire"):  # Check if pipewire is running
         if Path("/usr/bin/pacman").exists():
             # bash("pacman -S --noconfirm wireplumber")
             # install pipewire by wireplumber provider and yes erease pulse-audio
@@ -145,7 +142,7 @@ def zen2_audio(username):
 def post_misc() -> None:
     """
     Perform misc operation to fix sound\n
-    Global to every devices
+    Global to every device
     """
     # Xfce sound mixer
     de = bash("echo $XDG_CURRENT_DESKTOP")
@@ -154,16 +151,15 @@ def post_misc() -> None:
 
 
 def install_package(arch_package: str = "", deb_package: str = "", rpm_package: str = "", reinstall: bool = False):
-    # IMPORTANT: sudo is needed, due to some parts of the script running as non-root
     if Path("/usr/bin/pacman").exists():
-        bash(f"sudo pacman -S --noconfirm {arch_package}")  # arch always reinstalls with -S
+        bash(f"pacman -S --noconfirm {arch_package}")  # arch always reinstalls with -S
     elif Path("/usr/bin/apt").exists():
         if reinstall:
-            bash(f"sudo apt-get install -y --reinstall {deb_package}")
+            bash(f"apt-get install -y --reinstall {deb_package}")
         else:
             bash(f"apt-get install -y {deb_package}")
     elif Path("/usr/bin/dnf").exists():
-        bash(f"sudo dnf install -y {rpm_package}")
+        bash(f"dnf install -y {rpm_package}")
     else:
         print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
         exit(1)
@@ -182,14 +178,13 @@ def remove_package(arch_package: str = "", deb_package: str = "", rpm_package: s
 
 
 def update_system() -> None:
-    # IMPORTANT: sudo is needed, due to some parts of the script running as non-root
     if Path("/usr/bin/pacman").exists():
-        bash(f"sudo pacman -Syu")
+        bash(f"pacman -Syu")
     elif Path("/usr/bin/apt").exists():
-        bash(f"sudo apt-get update")
-        bash(f"sudo apt-get -y upgrade")
+        bash(f"apt-get update")
+        bash(f"apt-get -y upgrade")
     elif Path("/usr/bin/dnf").exists():
-        bash(f"sudo dnf upgrade -y")
+        bash(f"dnf upgrade -y")
     else:
         print_warning("Unknown package manager! Cannot update system. Skipping")
         pass
@@ -204,16 +199,6 @@ if __name__ == "__main__":
 
     # Restart script as root
     if not os.geteuid() == 0:
-        # Get pactl info
-        mkdir("/tmp/eupnea-audio")
-        if not path_exists("/usr/bin/pactl"):
-            print_status("pactl not found, Installing pulseaudio-utils")
-            update_system()
-            install_package("alsa-utils", "alsa-utils", "alsa-utils")
-            install_package("libpulse", "pulseaudio-utils", "pulseaudio-utils")
-        with open("/tmp/eupnea-audio/pactl", "w") as file:
-            file.write(bash("pactl info"))
-
         # save username
         with open("/tmp/username", "w") as file:
             # get non root username. os.getlogin() seems to fail in chroots
