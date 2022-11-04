@@ -15,7 +15,7 @@ def process_args():
     #                     help="Use local files, instead of downloading from the internet (not recommended).")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=True,
                         help="Print more output")
-    parser.add_argument("-d", "--debug", action="store_true", dest="assume", default=False,
+    parser.add_argument("-d", "--debug", action="store_true", dest="debug", default=False,
                         help="Debug purpose, might do nothing for final user")
     return parser.parse_args()
 
@@ -71,7 +71,7 @@ def zen2_audio(username):
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
-    if not ("PipeWire" in pactl) and not args.assume:
+    if not ("PipeWire" in pactl):
 
         if Path("/usr/bin/pacman").exists():
             #bash("pacman -S --noconfirm wireplumber")
@@ -213,8 +213,8 @@ if __name__ == "__main__":
     args = process_args()  # process args before elevating to root for better ux
     # TODO: install universal dependencies before elevating to root
 
-    if args.assume:
-        print_warning("Assume argument enable")
+    if args.debug:
+        print_warning("debug argument enable")
 
     # Restart script as root
     if not os.geteuid() == 0:
