@@ -182,12 +182,14 @@ def remove_package(arch_package: str = "", deb_package: str = "", rpm_package: s
 
 
 def update_system() -> None:
+    # IMPORTANT: sudo is needed, due to some parts of the script running as non-root
     if Path("/usr/bin/pacman").exists():
-        bash(f"pacman -Syu")
+        bash(f"sudo pacman -Syu")
     elif Path("/usr/bin/apt").exists():
-        bash(f"apt update; apt upgrade -y")
+        bash(f"sudo apt-get update")
+        bash(f"sudo apt-get -y upgrade")
     elif Path("/usr/bin/dnf").exists():
-        bash(f"dnf upgrade -y")
+        bash(f"sudo dnf upgrade -y")
     else:
         print_warning("Unknown package manager! Cannot update system. Skipping")
         pass
