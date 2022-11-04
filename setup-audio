@@ -64,7 +64,6 @@ def str_audio():
 def zen2_audio(username):
     print_status("Installing zen2 audio")
     install_package("U")
-    install_package("I", "alsa-utils", "alsa-utils", "alsa-utils")
     with open("/tmp/eupnea-audio/pactl", "r") as file:
         pactl = file.read()  # pactl was run at the start as non-root
     rmfile("/tmp/eupnea-audio/pactl")
@@ -87,7 +86,7 @@ def zen2_audio(username):
             with open("/etc/os-release", "r") as file:
                 os_release = file.read().lower()
             
-            if "ubuntu 22.04" in os_release:  # Remove pulseaudio and install pipewire on ubuntu 22.04
+            if "ubuntu" in os_release:  # Remove pulseaudio and install pipewire on ubuntu 22.04 or 22.10
                 # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
                 bash("apt install -y pipewire pipewire-pulse")
                 bash("apt-get remove -y pulseaudio-module-bluetooth")  # Remove pulseaudio bluetooth module
@@ -255,21 +254,15 @@ if __name__ == "__main__":
                 with open("/tmp/eupnea-audio/pactl", "r") as file:
                     pactl = file.read()
                 if pactl == "nopactl":
-                    # Determine distro (somtime pactl ins't required):
-                    with open("/etc/os-release", "r") as file:
-                        os_release = file.read().lower()
-                    if "ubuntu 22.10" in os_release:
-                        dassume = True
-                    else:
-                        dassume = False
                     print_warning("pulseaudio-utils is not installed,")
-                    if args.assume or dassume:
+                    if args.assume:
                         print_warning("Assuming that this package isn't installed, skip ...")
                     else:
                         rmfile("/tmp/eupnea-audio/pactl")
                         print_question("Attempt to install pulseaudio-utils (pactl)? (y/n)")
                         if input() in ["y","Y","yes"]:
                             install_package("U")
+                            install_package("I", "alsa-utils", "alsa-utils", "alsa-utils")
                             install_package("I","libpulse","pulseaudio-utils","pulseaudio-utils")
                             print_status("Please restart the script (run 'setup-audio')") # pactl must be run by regular user
                             exit(0)
