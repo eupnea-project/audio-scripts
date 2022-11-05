@@ -41,8 +41,18 @@ def sof_audio(platform, username):
     install_package("linux-firmware", "linux-firmware", "linux-firmware", reinstall=True)
     install_package("alsa-utils", "alsa-utils", "alsa-utils")
 
-    # Copy config files
+    # Force sof driver
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
+
+    # Ucm for glk
+    if "glk" in platform:
+        # Some distros (arch) are starting to package ucm for sof-glkda7219max in alsa-ucm-conf
+        update_system()
+        install_package("alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm-conf")
+        ucmdir = os.listdir("/usr/share/alsa/ucm2/Intel")
+        if not "sof-glkda7219max" in ucmdir:
+            cpdir(f"{config_path}/audio/sof/sof-glkda7219max/", "/usr/share/alsa/ucm2/Intel/sof-glkda7219max/")
+            cpdir(f"{config_path}/audio/sof/da7219/", "/usr/share/alsa/ucm2/codecs/da7219/")
 
 
 def str_audio():
