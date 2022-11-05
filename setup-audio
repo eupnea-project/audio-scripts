@@ -40,22 +40,9 @@ def sof_audio(platform, username):
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", reinstall=True)
     install_package("linux-firmware", "linux-firmware", "linux-firmware", reinstall=True)
     install_package("alsa-utils", "alsa-utils", "alsa-utils")
-    # install_package("pulseaudio", "pulseaudio", "pulseaudio")
 
     # Copy config files
-    # cpfile(f"{config_path}/audio/sof/alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
-    # cpfile(f"{config_path}/audio/sof/asound.conf", "/etc/asound.conf")
-    # cpfile(f"{config_path}/audio/sof/default.pa", "/etc/pulse/default.pa")
-    # cpfile(f"{config_path}/audio/sof/pulseaudio.service", "/usr/lib/systemd/user/pulseaudio.service")
-
-    # bash("systemctl daemon-reload")  # Reload systemd configs
-    # bash("systemctl enable alsa-reload")  # enable custom service
-
-    # Run systemctl commands as a regular user
-    # bash(f"systemctl --machine={username}@.host --user mask pipewire.{socket,service}")
-    # bash(f"systemctl --machine={username}@.host --user unmask pulseaudio.{socket,service}")
-    # bash(f"systemctl --machine={username}@.host --user enable pulseaudio.{socket,service}")
 
 
 def str_audio():
