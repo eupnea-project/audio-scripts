@@ -43,7 +43,8 @@ def sof_audio(platform, username):
         if "ubuntu" in f.read():
             install_package(deb_package="linux-firmware", reinstall=True)
         else:
-            install_package("linux-firmware", "firmware-linux-free firmware-linux-nonfree", "linux-firmware", reinstall=True)
+            install_package("linux-firmware", "firmware-linux-free firmware-linux-nonfree", "linux-firmware",
+                            reinstall=True)
     install_package("alsa-utils", "alsa-utils", "alsa-utils")
 
     # Force sof driver
@@ -161,14 +162,20 @@ def post_misc() -> None:
 
 def install_package(arch_package: str = "", deb_package: str = "", rpm_package: str = "", reinstall: bool = False):
     if Path("/usr/bin/pacman").exists():
-        bash(f"pacman -S --noconfirm {arch_package}")  # arch always reinstalls with -S
+        if reinstall:
+            bash(f"pacman -S --noconfirm {arch_package}")
+        else:
+            bash(f"pacman -S --noconfirm --needed --reinstall {arch_package}")
     elif Path("/usr/bin/apt").exists():
         if reinstall:
             bash(f"apt-get install -y --reinstall {deb_package}")
         else:
             bash(f"apt-get install -y {deb_package}")
     elif Path("/usr/bin/dnf").exists():
-        bash(f"dnf install -y {rpm_package}")
+        if reinstall:
+            bash(f"dnf reinstall -y {rpm_package}")
+        else:
+            bash(f"dnf install -y {rpm_package}")
     else:
         print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
         exit(1)
