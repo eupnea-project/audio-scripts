@@ -45,12 +45,12 @@ def sof_audio(platform, username):
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
 
     # Ucm for glk
-    if "glk" in platform:
+    if platform == "glk":
         # Some distros (arch) are starting to package ucm for sof-glkda7219max in alsa-ucm-conf
         update_system()
         install_package("alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm-conf")
-        ucmdir = os.listdir("/usr/share/alsa/ucm2/Intel")
-        if not "sof-glkda7219max" in ucmdir:
+        mkdir("/usr/share/alsa/ucm2/Intel")  # directory might not exist
+        if "sof-glkda7219max" not in os.listdir("/usr/share/alsa/ucm2/Intel"):
             cpdir(f"{config_path}/audio/sof/sof-glkda7219max/", "/usr/share/alsa/ucm2/Intel/sof-glkda7219max/")
             cpdir(f"{config_path}/audio/sof/da7219/", "/usr/share/alsa/ucm2/codecs/da7219/")
 
