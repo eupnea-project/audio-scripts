@@ -17,7 +17,7 @@ def process_args():
                         help="Print more output")
     # parser.add_argument("-d", "--debug", action="store_true", dest="debug", default=False,
     #                     help="Debug purpose, might do nothing for final user")
-    parser.add_argument("--board_name", "-b", dest="board_name", type=str, nargs=1, default=[""],
+    parser.add_argument("-b", "--board_name", dest="board_name", type=str, nargs=1, default=[""],
                         help="Override board name. FOR TESTING ONLY")
     return parser.parse_args()
 
