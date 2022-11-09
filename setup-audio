@@ -164,7 +164,7 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
         if reinstall:
             bash(f"pacman -S --noconfirm {arch_package}")
         else:
-            bash(f"pacman -S --noconfirm --needed --reinstall {arch_package}")
+            bash(f"pacman -S --noconfirm --needed {arch_package}")
     elif Path("/usr/bin/apt").exists():
         if reinstall:
             bash(f"apt-get install -y --reinstall {deb_package}")
