@@ -25,12 +25,12 @@ def process_args():
 def avs_audio(platform):
     print_status("Installing AVS")
     print_error("WARNING: AVS currently has a bug that will cause your speakers to blow up if you go above 55% volume. You can safely use 50% and below. This does not affect headphones or hdmi, only speakers.")
-    user_input = input("Type "I Understand" in all caps to continue: ")
+    user_input = input('Type "I Understand" in all caps to continue: ')
     while user_input != "I UNDERSTAND":
-        user_input = input("Type "I Understand" in all caps to continue: ")
+        user_input = input('Type "I Understand" in all caps to continue: ')
     if "apl" in platform:
         # Firmware, tplg, and ucm is from the chrultrabook discord.
-        cpdir(f"{config_path}/audio/avs/apl/ucm", "/usr/share/alsa/ucm2")
+        cpdir(f"{config_path}/audio/avs/apl/ucm", "/usr/share/alsa/ucm2/conf.d/")
         cpdir(f"{config_path}/audio/avs/apl/fw", "/lib/firmware/intel/avs")
         cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
     else:
