@@ -81,7 +81,7 @@ def zen2_audio(username):
             # Enable + start pipewire
             bash(f"systemctl --machine={username}@.host --user --now enable pipewire.service")
             # Enable + start pipewire-pulse
-            bash(f"systemctl --machine={username}@.host --user --now enable pipwire-pulse.service")
+            bash(f"systemctl --machine={username}@.host --user --now enable pipewire-pulse.service")
             # Enable + start wireplumber
             bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
 
