@@ -73,20 +73,17 @@ def bsw_audio():
 def zen2_audio(username):
     print_status("Installing zen2 audio")
     update_system()
-    if not bash("ps -e").__contains__("pipewire"):  # Check if pipewire is running
+    if not bash("ps -e").__contains__("pipewire-pulse"):  # Check if pipewire is running
         print_status("PipeWire is not running, installing it")
         if Path("/usr/bin/pacman").exists():
-            # bash("pacman -S --noconfirm wireplumber")
-            # install pipewire by wireplumber provider and yes erease pulse-audio
-            print_warning("Please accept any further transaction. (enter '1','y','y','y')")
-            bash("pacman -S pipewire-pulse")
+            bash("pacman -S --noconfirm wireplumber")
+            bash("yes | pacman -S pipewire-pulse")  # force resolve dependencies
             # Enable + start pipewire
-            bash(f"systemctl --machine={username}@.host --user enable pipewire.service")
-            bash(f"systemctl --machine={username}@.host --user start pipewire.service")
+            bash(f"systemctl --machine={username}@.host --user --now enable pipewire.service")
             # Enable + start pipewire-pulse
-            bash(f"systemctl --machine={username}@.host --user enable pipwire-pulse.service")
-            bash(f"systemctl --machine={username}@.host --user start pipwire-pulse.service")
-            # bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
+            bash(f"systemctl --machine={username}@.host --user --now enable pipewire-pulse.service")
+            # Enable + start wireplumber
+            bash(f"systemctl --machine={username}@.host --user --now enable wireplumber.service")  # enable wireplumber
 
         elif path_exists("/usr/bin/apt"):
             with open("/etc/os-release", "r") as file:
