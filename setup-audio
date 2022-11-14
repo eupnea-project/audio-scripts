@@ -24,7 +24,7 @@ def process_args():
 
 def avs_audio(platform):
     print_status("Installing AVS")
-    print_error("WARNING: AVS currently has a bug that will cause your speakers to blow up if you go above 55% volume. You can safely use 50% and below. This does not affect headphones or hdmi, only speakers.")
+    print_error("WARNING: AVS is VERY unstable and can cause your speakers to BLOW UP! Stay below 40% to prevent your speakers from blowing up. Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
     user_input = input('Type "I Understand" in all caps to continue: ')
     while user_input != "I UNDERSTAND":
         user_input = input('Type "I Understand" in all caps to continue: ')
