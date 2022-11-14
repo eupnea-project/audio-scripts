@@ -45,10 +45,17 @@ def apl_audio():
 
     if driver.lower() == "sof":
         print_status("Using sof")
+        # Remove avs modprobe config if it exists
+        rmfile("/etc/modprobe.d/snd-avs.conf")
         sof_audio("apl", user_id)
     if driver.lower() == "avs":
         print_status("Using avs")
+        # Remove sof modprobe config if it exists
+        rmfile("/etc/modprobe.d/alsa-sof.conf")
         avs_audio("apl")
+    else:
+        print_error(f"Invalid option: {driver}")
+        exit(1)
 
 
 def sof_audio(platform, username):
