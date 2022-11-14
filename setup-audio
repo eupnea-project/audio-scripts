@@ -38,8 +38,17 @@ def avs_audio(platform):
 
 
 def apl_audio():
-    # TODO: add a selection to use either sof or avs
-    avs_audio("apl")
+    print_status("Apollolake has two audio drivers:")
+    print_status("SOF: Stable but doesn't work with headphones or mic.")
+    print_status("AVS: Unstable and can cause damage to speakers but supports all audio hardware.")
+    driver = input("Which driver would you like to use? [sof/avs]: ")
+
+    if driver.lower() == "sof":
+        print_status("Using sof")
+        sof_audio("apl", user_id)
+    if driver.lower() == "avs":
+        print_status("Using avs")
+        avs_audio("apl")
 
 
 def sof_audio(platform, username):
