@@ -24,13 +24,31 @@ def process_args():
 
 def avs_audio(platform):
     print_status("Installing AVS")
-    # TODO: add support for avs
-    print_error("avs audio is not implemented yet!")
+    print_error("WARNING: AVS is VERY unstable and can cause your speakers to BLOW UP! Stay below 40% to prevent your speakers from blowing up. Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
+    user_input = input('Type "I Understand" in all caps to continue: ')
+    while user_input != "I UNDERSTAND":
+        user_input = input('Type "I Understand" in all caps to continue: ')
+    if "apl" in platform:
+        # Firmware, tplg, and ucm is from the chrultrabook discord.
+        cpdir(f"{config_path}/audio/avs/apl/ucm", "/usr/share/alsa/ucm2/conf.d/")
+        cpdir(f"{config_path}/audio/avs/apl/fw", "/lib/firmware/intel/avs")
+        cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
+    else:
+        print(f"{platform} not supported")
 
 
 def apl_audio():
-    # TODO: add a selection to use either sof or avs
-    avs_audio("apl")
+    print_status("Apollolake has two audio drivers:")
+    print_status("SOF: Stable but doesn't work with headphones or mic.")
+    print_status("AVS: Unstable and can cause damage to speakers but supports all audio hardware.")
+    driver = input("Which driver would you like to use? [sof/avs]: ")
+
+    if driver.lower() == "sof":
+        print_status("Using sof")
+        sof_audio("apl", user_id)
+    if driver.lower() == "avs":
+        print_status("Using avs")
+        avs_audio("apl")
 
 
 def sof_audio(platform, username):
