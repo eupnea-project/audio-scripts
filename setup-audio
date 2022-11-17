@@ -179,6 +179,9 @@ def zen2_audio(username):
            "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
     bash("cd /usr/share/alsa/ucm2/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
 
+    # speaker warning
+    print_status("After rebooting you will need to set speakers as the output device in sound settings.")
+
 
 def post_misc() -> None:
     """
