@@ -35,6 +35,11 @@ def avs_audio(platform):
         cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
     else:
         print(f"{platform} not supported")
+    try:
+        kernel_version = bash("uname -r")
+        os.listdir(f"/lib/modules/{kernel_version}/kernel/sound/soc/intel/avs")
+    except FileNotFoundError:
+        print_error("Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs enabled.")
 
 
 def apl_audio():
