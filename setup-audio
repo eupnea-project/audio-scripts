@@ -24,7 +24,8 @@ def process_args():
 
 def avs_audio(platform):
     print_status("Installing AVS")
-    print_error("WARNING: AVS is VERY unstable and can cause your speakers to BLOW UP! Stay below 40% to prevent your speakers from blowing up. Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
+    print_error(
+        "WARNING: AVS is VERY unstable and can cause your speakers to BLOW UP! Stay below 40% to prevent your speakers from blowing up. Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
     user_input = input('Type "I Understand" in all caps to continue: ')
     while user_input != "I UNDERSTAND":
         user_input = input('Type "I Understand" in all caps to continue: ')
@@ -39,7 +40,8 @@ def avs_audio(platform):
         kernel_version = bash("uname -r")
         os.listdir(f"/lib/modules/{kernel_version}/kernel/sound/soc/intel/avs")
     except FileNotFoundError:
-        print_error("Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs enabled.")
+        print_error(
+            "Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs enabled.")
 
 
 def apl_audio():
@@ -188,17 +190,6 @@ def zen2_audio(username):
     print_status("After rebooting you will need to set speakers as the output device in sound settings.")
 
 
-def post_misc() -> None:
-    """
-    Perform misc operation to fix sound\n
-    Global to every device
-    """
-    # Xfce sound mixer
-    de = bash("echo $XDG_CURRENT_DESKTOP")
-    if de == "XFCE":
-        install_package("xfce4-pulseaudio-plugin", "xfce4-pulseaudio-plugin", "xfce4-pulseaudio-plugin")
-
-
 def install_package(arch_package: str = "", deb_package: str = "", rpm_package: str = "", reinstall: bool = False):
     if Path("/usr/bin/pacman").exists():
         if reinstall:
@@ -325,9 +316,6 @@ if __name__ == "__main__":
     except KeyError:
         print_error(f"Unknown/Unsupported chromebook model: {device_board}")
         exit(1)
-
-    # Perform misc operation
-    post_misc()
 
     print_header("Audio installed successfully! Reboot to enable audio.")
     input("\033[92m" + "Press ENTER to reboot or CTRL+C to cancel reboot" + "\033[0m")
