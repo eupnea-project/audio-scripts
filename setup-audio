@@ -274,7 +274,7 @@ if __name__ == "__main__":
     print_warning("WARNING: this audio script is not fully functional yet!")
 
     # Determine if running from a git clone or a eupnea system
-    if path_exists("/etc/eupnea"):
+    if sys.argv[0] == "/usr/local/bin/setup-audio":
         config_path = "/etc/eupnea"
     else:
         config_path = "configs"
