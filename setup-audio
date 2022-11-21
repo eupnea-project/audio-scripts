@@ -25,17 +25,23 @@ def process_args():
 def avs_audio(platform):
     print_status("Installing AVS")
     print_error(
-        "WARNING: AVS is VERY unstable and can cause your speakers to BLOW UP! Stay below 40% to prevent your speakers from blowing up. Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
+        "WARNING: AVS is VERY unstable and can cause your speakers to BLOW UP! Stay below 35% to prevent your speakers from blowing up. Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
+
     user_input = input('Type "I Understand" in all caps to continue: ')
     while user_input != "I UNDERSTAND":
         user_input = input('Type "I Understand" in all caps to continue: ')
+
     if "apl" in platform:
         # Firmware, tplg, and ucm is from the chrultrabook discord.
-        cpdir(f"{config_path}/audio/avs/apl/ucm", "/usr/share/alsa/ucm2/conf.d/")
-        cpdir(f"{config_path}/audio/avs/apl/fw", "/lib/firmware/intel/avs")
+        cpdir(f"{config_path}/audio/avs/ucm", "/usr/share/alsa/ucm2/conf.d/")
+        cpdir(f"{config_path}/audio/avs/apl", "/lib/firmware/intel/avs")
         cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
     else:
-        print(f"{platform} not supported")
+        print_warning("WARNING: You need a patched kernel to have working speakers on kabylake.")
+        cpdir(f"{config_path}/audio/avs/ucm", "/usr/share/alsa/ucm2/conf.d/")
+        cpdir(f"{config_path}/audio/avs/sklkbl", "/lib/firmware/intel/avs")
+        cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
+
     try:
         kernel_version = bash("uname -r")
         os.listdir(f"/lib/modules/{kernel_version}/kernel/sound/soc/intel/avs")
