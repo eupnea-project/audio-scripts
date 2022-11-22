@@ -103,10 +103,16 @@ def sof_audio(platform, username):
         cpdir(f"{config_path}/audio/sof/sof-cs42l42/", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42/")
         cpdir(f"{config_path}/audio/sof/cs42l42/", "/usr/share/alsa/ucm2/codecs/cs42l42/")
 
+    # Ucm for cml
+    if platform == "cml":
+        bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
+        cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/Intel/sof-rt5682")
+        cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
+
 
 def str_audio():
-    print_status("Installing STR")
-    print_error("str audio not implemented yet")
+    print_error("StoneyRidge is not supported.")
+    exit(0)
 
 
 def bsw_audio():
