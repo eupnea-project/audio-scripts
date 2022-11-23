@@ -43,12 +43,9 @@ def avs_audio(platform):
         cpdir(f"{config_path}/audio/avs/sklkbl", "/lib/firmware/intel/avs")
         cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
 
-    try:
-        kernel_version = bash("uname -r")
-        os.listdir(f"/lib/modules/{kernel_version}/kernel/sound/soc/intel/avs")
-    except FileNotFoundError:
-        print_error(
-            "Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs enabled.")
+    if not path_exists(f"/lib/modules/{bash('uname -r')}/kernel/sound/soc/intel/avs"):
+        print_error("Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs "
+                    "enabled. If you are on a Eupnea Project kernel, run 'manage-kernels -u --mainline' to update")
 
 
 def apl_audio():
