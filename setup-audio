@@ -108,6 +108,7 @@ def sof_audio(platform, username):
     if platform == "cml":
         bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
         cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/Intel/sof-rt5682")
+        cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/sof-rt5682")
         cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
 
 
