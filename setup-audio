@@ -99,6 +99,10 @@ def sof_audio(platform, username):
         cpdir(f"{config_path}/audio/sof/sof-cs42l42/", "/usr/share/alsa/ucm2/Intel/sof-cs42l42/")
         cpdir(f"{config_path}/audio/sof/sof-cs42l42/", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42/")
         cpdir(f"{config_path}/audio/sof/cs42l42/", "/usr/share/alsa/ucm2/codecs/cs42l42/")
+        # Same thing for rt5682
+        cpdir(f"{config_path}/audio/sof/sof-glkrt5682max/", "/usr/share/alsa/ucm2/Intel/sof-glkrt5682max/")
+        cpdir(f"{config_path}/audio/sof/sof-glkrt5682max/", "/usr/share/alsa/ucm2/conf.d/sof-glkrt5682max/")
+        cpdir(f"{config_path}/audio/sof/rt5682/", "/usr/share/alsa/ucm2/codecs/rt5682/")
 
     # Ucm for cml
     if platform == "cml":
