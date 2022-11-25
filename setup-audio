@@ -91,6 +91,7 @@ def sof_audio(platform, username):
         update_system()
         install_package("alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm")
         mkdir("/usr/share/alsa/ucm2/Intel")  # directory might not exist
+        rmdir("/tmp/ucm-configs")
         # if "sof-glkda7219max" not in os.listdir("/usr/share/alsa/ucm2/Intel"):
         cpdir(f"{config_path}/audio/sof/sof-glkda7219max/", "/usr/share/alsa/ucm2/Intel/sof-glkda7219max/")
         cpdir(f"{config_path}/audio/sof/sof-glkda7219max/", "/usr/share/alsa/ucm2/sof-glkda7219max/")
