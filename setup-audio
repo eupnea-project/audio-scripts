@@ -87,21 +87,15 @@ def sof_audio(platform, username):
 
     # Ucm for glk
     if platform == "glk":
-        # Some distros (arch) are starting to package ucm for sof-glkda7219max in alsa-ucm-conf
-        update_system()
-        install_package("alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm")
-        mkdir("/usr/share/alsa/ucm2/Intel")  # directory might not exist
-        rmdir("/tmp/ucm-configs")
-        # if "sof-glkda7219max" not in os.listdir("/usr/share/alsa/ucm2/Intel"):
-        cpdir(f"{config_path}/audio/sof/sof-glkda7219max/", "/usr/share/alsa/ucm2/Intel/sof-glkda7219max/")
-        cpdir(f"{config_path}/audio/sof/sof-glkda7219max/", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma/")
+        # Most devices use da7219/max98357a
+        cpdir(f"{config_path}/audio/sof/sof-glkda7219ma/", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma/")
         cpdir(f"{config_path}/audio/sof/da7219/", "/usr/share/alsa/ucm2/codecs/da7219/")
         # Some glk devices use cs42l42
         cpdir(f"{config_path}/audio/sof/sof-cs42l42/", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42/")
         cpdir(f"{config_path}/audio/sof/cs42l42/", "/usr/share/alsa/ucm2/codecs/cs42l42/")
         # Same thing for rt5682
         bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
-        cpdir("/tmp/ucm-configs/glk/sof-glkrt5682max", "/usr/share/alsa/ucm2/conf.d/sof-glkrt5682ma")
+        cpdir("/tmp/ucm-configs/glk/sof-glkrt5682ma", "/usr/share/alsa/ucm2/conf.d/sof-glkrt5682ma")
 
     # Ucm for cml
     if platform == "cml":
@@ -109,11 +103,6 @@ def sof_audio(platform, username):
         cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
         cpdir("/tmp/ucm-configs/cml/sof-cmlda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-cmlda7219ma")
         cpdir(f"{config_path}/audio/sof/da7219/", "/usr/share/alsa/ucm2/codecs/da7219/")
-
-
-def str_audio():
-    print_error("StoneyRidge is not supported.")
-    exit(0)
 
 
 def bsw_audio():
@@ -321,7 +310,8 @@ if __name__ == "__main__":
             case "tgl":
                 sof_audio("tgl", user_id)
             case "str":
-                str_audio()
+                print_error("StoneyRidge is not supported!")
+                exit(0)
             case "zen2":
                 zen2_audio(user_id)
             case _:
