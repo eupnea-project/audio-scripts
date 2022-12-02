@@ -87,14 +87,12 @@ def sof_audio(platform, username):
 
     # Ucm for glk
     if platform == "glk":
-        # Most devices use da7219/max98357a
-        cpdir(f"{config_path}/audio/sof/sof-glkda7219ma/", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma/")
-        cpdir(f"{config_path}/audio/sof/da7219/", "/usr/share/alsa/ucm2/codecs/da7219/")
-        # Some glk devices use cs42l42
-        cpdir(f"{config_path}/audio/sof/sof-cs42l42/", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42/")
-        cpdir(f"{config_path}/audio/sof/cs42l42/", "/usr/share/alsa/ucm2/codecs/cs42l42/")
-        # Same thing for rt5682
         bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
+        # Most devices use da7219/max98357a
+        cpdir("/tmp/ucm-configs/glk/sof-glkda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma")
+        # Some glk devices use cs42l42
+        cpdir("/tmp/ucm-configs/glk/sof-cs42l42", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42")
+        # Same thing for rt5682
         cpdir("/tmp/ucm-configs/glk/sof-glkrt5682ma", "/usr/share/alsa/ucm2/conf.d/sof-glkrt5682ma")
 
     # Ucm for cml
