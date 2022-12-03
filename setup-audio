@@ -85,9 +85,11 @@ def sof_audio(platform, username):
     # Force sof driver
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
 
+    # Clone ucm repo
+    bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
+
     # Ucm for glk
     if platform == "glk":
-        bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
         # Most devices use da7219/max98357a
         cpdir("/tmp/ucm-configs/glk/sof-glkda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma")
         # Some glk devices use cs42l42
@@ -97,9 +99,12 @@ def sof_audio(platform, username):
 
     # Ucm for cml
     if platform == "cml":
-        bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
         cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
         cpdir("/tmp/ucm-configs/cml/sof-cmlda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-cmlda7219ma")
+
+    # Ucm for tgl
+    if platform == "tgl":
+        cpdir("/tmp/ucm-configs/tgl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
 
 
 def bsw_audio():
