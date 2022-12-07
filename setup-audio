@@ -106,6 +106,9 @@ def sof_audio(platform, username):
     if platform == "tgl":
         cpdir("/tmp/ucm-configs/tgl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
 
+    # Ucm for jsl
+    if platform == "jsl":
+        cpdir("/tmp/ucm-configs/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
 
 def bsw_audio():
     print_status("Fixing braswell audio")
