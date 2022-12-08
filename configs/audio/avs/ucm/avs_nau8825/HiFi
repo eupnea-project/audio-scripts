@@ -1,0 +1,44 @@
+SectionVerb {
+	Value {
+		FullySpecifiedUCM "1"
+	}
+	EnableSequence [
+		cset "name='Headphone Jack' off"
+		cset "name='Headset Mic' off"
+		cset "name='Frontend PGA' 37"
+	]
+	DisableSequence [
+	]
+}
+
+SectionDevice."Headphone" {
+	Comment "Headphone"
+	Value {
+		PlaybackPCM "hw:avsnau8825,1"
+		PlaybackMixerElem "Headphone"
+		JackDev "avs_nau8825 Headset Jack"
+		JackSwitch "2"
+	}
+	EnableSequence [
+		cset "name='Headphone Jack' on"
+	]
+	DisableSequence [
+		cset "name='Headphone Jack' off"
+	]
+}
+
+SectionDevice."Mic" {
+	Comment "Mic"
+	Value {
+		CapturePCM "hw:avsnau8825,1"
+		CaptureMixerElem "Headset Mic"
+		JackDev "avs_nau8825 Headset Jack"
+	}
+
+	EnableSequence [
+		cset "name='Headset Mic' on"
+	]
+	DisableSequence [
+		cset "name='Headset Mic' off"
+	]
+}
