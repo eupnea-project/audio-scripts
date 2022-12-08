@@ -86,6 +86,14 @@ def sof_audio(platform, username):
     # Force sof driver
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
 
+    # Install pipewire
+    install_package("pipewire", "pipewire", "pipewire")
+    install_package("pipewire-pulse", "pipewire-pulse", "pipewire-pulse")
+
+    bash(f"systemctl --machine={username}@.host --user --now disable pulseaudio.service pulseaudio.socket")
+    bash(f"systemctl --machine={username}@.host --user mask pulseaudio")
+    bash(f"systemctl --machine={username}@.host --user --now enable pipewire pipewire-pulse")
+
     # Clone ucm repo
     bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
 
