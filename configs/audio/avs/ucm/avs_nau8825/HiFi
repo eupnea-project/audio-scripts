@@ -3,8 +3,8 @@ SectionVerb {
 		FullySpecifiedUCM "1"
 	}
 	EnableSequence [
-		cset "name='Headphone Jack' off"
-		cset "name='Headset Mic' off"
+		cset "name='Headphone Jack Switch' off"
+		cset "name='Headset Mic Switch' off"
 		cset "name='Frontend PGA' 37"
 	]
 	DisableSequence [
@@ -20,10 +20,10 @@ SectionDevice."Headphone" {
 		JackSwitch "2"
 	}
 	EnableSequence [
-		cset "name='Headphone Jack' on"
+		cset "name='Headphone Jack Switch' on"
 	]
 	DisableSequence [
-		cset "name='Headphone Jack' off"
+		cset "name='Headphone Jack Switch' off"
 	]
 }
 
@@ -36,9 +36,9 @@ SectionDevice."Mic" {
 	}
 
 	EnableSequence [
-		cset "name='Headset Mic' on"
+		cset "name='Headset Mic Switch' on"
 	]
 	DisableSequence [
-		cset "name='Headset Mic' off"
+		cset "name='Headset Mic Switch' off"
 	]
 }
