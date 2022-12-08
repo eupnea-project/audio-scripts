@@ -89,7 +89,7 @@ def sof_audio(platform, username):
 
     # Install pipewire
     install_package("pipewire", "pipewire", "pipewire")
-    install_package("pipewire-pulse", "pipewire-pulse", "pipewire-pulse")
+    install_package("pipewire-pulse", "pipewire-pulse", "pipewire-pulseaudio")
 
     bash(f"systemctl --machine={username}@.host --user --now disable pulseaudio.service pulseaudio.socket")
     bash(f"systemctl --machine={username}@.host --user mask pulseaudio")
