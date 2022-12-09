@@ -6,9 +6,9 @@ SectionVerb {
 		cset "name='Headphone Jack Switch' off"
 		cset "name='Headset Mic Switch' off"
 		cset "name='Frontend PGA Volume' 37"
-		cset "name='Headphone Volume' 31"
-		cset "name='Headphone Bypass Volume' 7"
-		cset "name='Headphone Crosstalk Volume' 120"
+		cset "name='Headphone Volume' 37"
+		cset "name='Headphone Bypass Volume' 8"
+		cset "name='Headphone Crosstalk Volume' 140"
 	]
 	DisableSequence [
 	]
