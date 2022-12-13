@@ -44,6 +44,8 @@ def avs_audio(platform):
         cpdir(f"{config_path}/audio/avs/ucm", "/usr/share/alsa/ucm2/conf.d/")
         cpdir(f"{config_path}/audio/avs/sklkbl", "/lib/firmware/intel/avs")
         cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
+        # Delete topology for speakers to prevent them from working until there is a volume limiter.
+        # Advanced users can comment this line as long as they understand the risks.
         rmfile("/lib/firmware/intel/avs/max98357a-tplg.bin")
 
     if not path_exists(f"/lib/modules/{bash('uname -r')}/kernel/sound/soc/intel/avs"):
