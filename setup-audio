@@ -24,9 +24,9 @@ def process_args():
 
 def avs_audio(platform):
     print_status("Installing AVS")
-    print_error("WARNING: AVS is VERY unstable and can cause your speakers to BLOW UP! Stay below 35% to prevent your"
-                " speakers from blowing up. Headphones and HDMI audio are safe from this. If the driver crashes reboot"
-                " to fix it.")
+    print_error("WARNING: AVS is VERY unstable and can cause permanent damage to your speakers! "
+                "As a safety precaution your speakers have been disabled until a fix is in place. "
+                "Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
 
     user_input = input('Type "I Understand" in all caps to continue: ')
     while user_input != "I UNDERSTAND":
@@ -44,6 +44,7 @@ def avs_audio(platform):
         cpdir(f"{config_path}/audio/avs/ucm", "/usr/share/alsa/ucm2/conf.d/")
         cpdir(f"{config_path}/audio/avs/sklkbl", "/lib/firmware/intel/avs")
         cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
+        rmfile("/lib/firmware/intel/avs/max98357a-tplg.bin")
 
     if not path_exists(f"/lib/modules/{bash('uname -r')}/kernel/sound/soc/intel/avs"):
         print_error("Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs "
@@ -54,6 +55,7 @@ def apl_audio():
     print_status("Apollolake has two audio drivers:")
     print_status("SOF: Stable but doesn't work with headphones or mic.")
     print_status("AVS: Unstable and can cause damage to speakers but supports all audio hardware.")
+    print_error("NOTE: Speakers are disabled on AVS as a safety precaution. Your speakers will still work on SOF though.")
     driver = input("Which driver would you like to use? [sof/avs]: ")
 
     if driver.lower() == "sof":
