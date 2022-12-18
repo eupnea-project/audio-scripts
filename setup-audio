@@ -90,7 +90,9 @@ def sof_audio(platform, username):
 
     # Force sof driver
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
-
+    
+    # Delete repo just in case it already exists
+    rmdir("/tmp/ucm-configs")
     # Clone ucm repo
     bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
     match platform:
