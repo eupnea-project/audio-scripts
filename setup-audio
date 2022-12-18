@@ -275,7 +275,7 @@ if __name__ == "__main__":
         set_verbose(args.verbose)
 
     # Determine if running from a git clone or a eupnea system
-    if sys.argv[0] == "/usr/local/bin/setup-audio":
+    if sys.argv[0] == "/usr/bin/setup-audio":
         config_path = "/etc/eupnea"
         sys.path.insert(0, "/usr/lib")
         from functions import *
