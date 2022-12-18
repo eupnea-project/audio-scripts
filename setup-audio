@@ -270,18 +270,21 @@ if __name__ == "__main__":
         print_warning("Verbosity increased")
         set_verbose(args.verbose)
 
+    # Determine if running from a git clone or a eupnea system
+    if sys.argv[0] == "/usr/bin/setup-audio":
+        config_path = "/etc/eupnea"
+        sys.path.insert(0, "/usr/lib")
+        from functions import *
+    else:
+        config_path = "configs"
+        from functions import *
+
     # Remove old files
     rmdir("/tmp/eupnea-audio")
     mkdir("/tmp/eupnea-audio")
 
     # Important message
     print_warning("WARNING: this audio script is not fully functional yet!")
-
-    # Determine if running from a git clone or a eupnea system
-    if sys.argv[0] == "/usr/local/bin/setup-audio":
-        config_path = "/etc/eupnea"
-    else:
-        config_path = "configs"
 
     if args.board_name[0] == "":
         # Get the board name from dmi
