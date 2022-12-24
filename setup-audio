@@ -5,8 +5,6 @@ import sys
 import json
 import argparse
 
-from functions import *
-
 
 # parse arguments from the cli. Only for testing/advanced use.
 def process_args():
@@ -57,7 +55,8 @@ def apl_audio():
     print_status("Apollolake has two audio drivers:")
     print_status("SOF: Stable but doesn't work with headphones or mic.")
     print_status("AVS: Unstable and can cause damage to speakers but supports all audio hardware.")
-    print_error("NOTE: Speakers are disabled on AVS as a safety precaution. Your speakers will still work on SOF though.")
+    print_error("NOTE: Speakers are disabled on AVS as a safety precaution. "
+                "Your speakers will still work on SOF though.")
     driver = input("Which driver would you like to use? [sof/avs]: ")
 
     if driver.lower() == "sof":
@@ -90,7 +89,7 @@ def sof_audio(platform, username):
 
     # Force sof driver
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
-    
+
     # Delete repo just in case it already exists
     rmdir("/tmp/ucm-configs")
     # Clone ucm repo
@@ -247,6 +246,15 @@ def update_system() -> None:
 
 
 if __name__ == "__main__":
+    # Determine if running from a git clone or a eupnea system
+    if sys.argv[0] == "/usr/bin/setup-audio":
+        config_path = "/etc/eupnea"
+        sys.path.insert(0, "/usr/lib")
+        from functions import *
+    else:
+        config_path = "configs"
+        from functions import *
+
     if os.geteuid() == 0 and not path_exists("/tmp/username"):
         print_error("Please start the script as non-root/without sudo")
         exit(1)
@@ -257,7 +265,7 @@ if __name__ == "__main__":
     if not os.geteuid() == 0:
         # save username
         with open("/tmp/username", "w") as file:
-            # get non root username. os.getlogin() seems to fail in chroots
+            # get non-root username. os.getlogin() seems to fail in chroots
             file.write(bash("whoami").strip())
 
         # restart script as root
@@ -271,15 +279,6 @@ if __name__ == "__main__":
     if args.verbose:
         print_warning("Verbosity increased")
         set_verbose(args.verbose)
-
-    # Determine if running from a git clone or a eupnea system
-    if sys.argv[0] == "/usr/bin/setup-audio":
-        config_path = "/etc/eupnea"
-        sys.path.insert(0, "/usr/lib")
-        from functions import *
-    else:
-        config_path = "configs"
-        from functions import *
 
     # Remove old files
     rmdir("/tmp/eupnea-audio")
