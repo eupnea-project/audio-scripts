@@ -43,7 +43,7 @@ def avs_audio(platform):
         cpdir(f"{config_path}/audio/avs/sklkbl", "/lib/firmware/intel/avs")
         cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
         # Delete topology for speakers to prevent them from working until there is a volume limiter.
-        # Advanced users can comment this line as long as they understand the risks.
+        # Advanced users can comment the following line as long as they understand the risks.
         rmfile("/lib/firmware/intel/avs/max98357a-tplg.bin")
 
     if not path_exists(f"/lib/modules/{bash('uname -r')}/kernel/sound/soc/intel/avs"):
@@ -57,24 +57,27 @@ def apl_audio():
     print_status("AVS: Unstable and can cause damage to speakers but supports all audio hardware.")
     print_error("NOTE: Speakers are disabled on AVS as a safety precaution. "
                 "Your speakers will still work on SOF though.")
-    driver = input("Which driver would you like to use? [sof/avs]: ")
 
-    if driver.lower() == "sof":
-        print_status("Using sof")
-        # Remove avs modprobe config if it exists
-        rmfile("/etc/modprobe.d/snd-avs.conf")
-        sof_audio("apl", user_id)
-    elif driver.lower() == "avs":
-        print_status("Using avs")
-        # Remove sof modprobe config if it exists
-        rmfile("/etc/modprobe.d/alsa-sof.conf")
-        avs_audio("apl")
-    else:
-        print_error(f"Invalid option: {driver}")
-        exit(1)
+    while True:
+        user_input = input("Which driver would you like to use? [sof/avs]: ")
+        if user_input.lower() == "sof":
+            print_status("Using sof")
+            # Remove avs modprobe config if it exists
+            rmfile("/etc/modprobe.d/snd-avs.conf")
+            sof_audio("apl", user_id)
+            break
+        elif user_input.lower() == "avs":
+            print_status("Using avs")
+            # Remove sof modprobe config if it exists
+            rmfile("/etc/modprobe.d/alsa-sof.conf")
+            avs_audio("apl")
+            break
+        else:
+            print_error(f"Invalid option: {user_input}")
+            continue
 
 
-def sof_audio(platform, username):
+def sof_audio(platform):
     print_status("Installing SOF")
     # Install required packages
     # Sof firmware needs to be reinstalled for some reason.
@@ -96,7 +99,7 @@ def sof_audio(platform, username):
     bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
     match platform:
         case "glk":
-            # Most devices use da7219/max98357a
+            # Most glk devices use da7219/max98357a
             cpdir("/tmp/ucm-configs/glk/sof-glkda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma")
             # Some glk devices use cs42l42
             cpdir("/tmp/ucm-configs/glk/sof-cs42l42", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42")
@@ -135,7 +138,7 @@ def zen2_audio(username):
             with open("/etc/os-release", "r") as file:
                 os_release = file.read().lower()
             # Remove pulseaudio and install pipewire on ubuntu 22.04 or 22.10
-            # On 22.10 some DEs might still use pulseaudio
+            # On 22.10 some DEs still use pulseaudio
             if "ubuntu 22.10" in os_release or "ubuntu 22.04" in os_release:
                 # https://ubuntuhandbook.org/index.php/2022/04/pipewire-replace-pulseaudio-ubuntu-2204/
                 install_package(deb_package="pipewire pipewire-pulse")
@@ -155,9 +158,8 @@ def zen2_audio(username):
 
             elif "debian gnu/linux 11 (bullseye)" in os_release:
                 # https://trendoceans.com/install-pipewire-on-debian-11/
-                bash("sudo apt-get install -y pipewire pipewire-audio-client-libraries")
-                open("/etc/pipewire/media-session.d/with-pulseaudio",
-                     'a').close()  # create an empty file
+                install_package(deb_package="pipewire pipewire-audio-client-libraries")
+                open("/etc/pipewire/media-session.d/with-pulseaudio", 'a').close()  # create an empty file
                 cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.service",
                        "/etc/systemd/user/pipewire-pulse.service")
                 cpfile("/usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.socket",
@@ -309,15 +311,15 @@ if __name__ == "__main__":
             case "apl":
                 apl_audio()
             case "glk":
-                sof_audio("glk", user_id)
+                sof_audio("glk")
             case "whl":
-                sof_audio("whl", user_id)
+                sof_audio("whl")
             case "cml":
-                sof_audio("cml", user_id)
+                sof_audio("cml")
             case "jsl":
-                sof_audio("jsl", user_id)
+                sof_audio("jsl")
             case "tgl":
-                sof_audio("tgl", user_id)
+                sof_audio("tgl")
             case "str":
                 print_error("StoneyRidge is not supported!")
                 exit(0)
