@@ -79,6 +79,14 @@ def apl_audio():
 
 def sof_audio(platform):
     print_status("Installing SOF")
+
+    # Dont allow running this on Tigerlake models with max98357a
+    if "tgl" in platform:
+        if bash("dmesg | grep MX98357A") != "":
+            print_error("Your device uses max98357a which is known to cause permanent damage to speakers! As a safety precaution the sound drivers have been blocked from loading.")
+            cpfile(f"{config_path}/audio/sof/blacklist-sof.conf", "/etc/modprobe.d/blacklist-sof.conf")
+            exit(0)
+
     # Install required packages
     # Sof firmware needs to be reinstalled for some reason.
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", reinstall=True)
