@@ -11,7 +11,7 @@ def process_args():
     parser = argparse.ArgumentParser()
     # parser.add_argument('-l', '--local-path', dest="local_path",
     #                     help="Use local files, instead of downloading from the internet (not recommended).")
-    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=True,
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
                         help="Print more output")
     # parser.add_argument("-d", "--debug", action="store_true", dest="debug", default=False,
     #                     help="Debug purpose, might do nothing for final user")
