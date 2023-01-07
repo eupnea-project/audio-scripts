@@ -263,11 +263,9 @@ if __name__ == "__main__":
     if sys.argv[0] == "/usr/bin/setup-audio":
         config_path = "/etc/eupnea"
         sys.path.insert(0, "/usr/lib/eupnea")
-        from functions import *
     else:
         config_path = "configs"
-        from functions import *
-
+    from functions import *
     if os.geteuid() == 0 and not path_exists("/tmp/username"):
         print_error("Please start the script as non-root/without sudo")
         exit(1)
