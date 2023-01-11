@@ -96,14 +96,14 @@ def sof_audio(platform):
 
     # Install required packages
     # Sof firmware needs to be reinstalled for some reason.
-    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", reinstall=True)
+    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "sof-firmware", reinstall=True)
     # linux-firmware has different names on ubuntu and debian
     with open("/etc/os-release") as f:
         if "ubuntu" in f.read():
             install_package(deb_package="linux-firmware")
         else:
-            install_package("linux-firmware", "firmware-linux-free firmware-linux-nonfree", "linux-firmware")
-    install_package("alsa-utils", "alsa-utils", "alsa-utils")
+            install_package("linux-firmware", "firmware-linux-free firmware-linux-nonfree", "linux-firmware", "kernel-firmware")
+    install_package("alsa-utils", "alsa-utils", "alsa-utils", "alsa-utils")
 
     # Force sof driver
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
@@ -213,7 +213,7 @@ def zen2_audio(username):
     print_status("After rebooting you will need to set speakers as the output device in sound settings.")
 
 
-def install_package(arch_package: str = "", deb_package: str = "", rpm_package: str = "", reinstall: bool = False):
+def install_package(arch_package: str = "", deb_package: str = "", rpm_package: str = "", suse_package: str = "", reinstall: bool = False):
     if Path("/usr/bin/pacman").exists():
         if reinstall:
             bash(f"pacman -S --noconfirm {arch_package}")
@@ -224,6 +224,11 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
             bash(f"apt-get install -y --reinstall {deb_package}")
         else:
             bash(f"apt-get install -y {deb_package}")
+    elif Path("/usr/bin/zypper").exists():
+        if reinstall:
+            bash(f"yes | zypper in -f {suse_package}")
+        else:
+            bash(f"yes | zypper in {suse_package}")
     elif Path("/usr/bin/dnf").exists():
         if reinstall:
             bash(f"dnf reinstall -y {rpm_package}")
@@ -239,6 +244,8 @@ def remove_package(arch_package: str = "", deb_package: str = "", rpm_package: s
         bash(f"pacman -Rsn --noconfirm {arch_package}")
     elif Path("/usr/bin/apt").exists():
         bash(f"apt-get remove -y {deb_package}")
+    elif Path("/usr/bin/zypper").exists():
+        bash(f"yes | zypper rm {suse_package}")
     elif Path("/usr/bin/dnf").exists():
         bash(f"dnf remove -y {rpm_package}")
     else:
@@ -252,6 +259,8 @@ def update_system() -> None:
     elif Path("/usr/bin/apt").exists():
         bash("apt-get update")
         bash("apt-get -y upgrade")
+    elif Path("/usr/bin/zypper").exists():
+        bash("yes | zypper up")
     elif Path("/usr/bin/dnf").exists():
         bash("dnf upgrade -y")
     else:
