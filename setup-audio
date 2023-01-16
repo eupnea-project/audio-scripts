@@ -123,6 +123,7 @@ def sof_audio(platform):
         case "cml":
             cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
             cpdir("/tmp/ucm-configs/cml/sof-cmlda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-cmlda7219ma")
+            cpdir("/tmp/ucm-configs/cml/sof-cml_rt1011", "/usr/share/alsa/ucm2/conf.d/sof-cml_rt1011")
         case "tgl":
             cpdir("/tmp/ucm-configs/tgl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
         case "jsl":
