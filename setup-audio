@@ -96,14 +96,14 @@ def sof_audio(platform):
 
     # Install required packages
     # Sof firmware needs to be reinstalled for some reason.
-    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "sof-firmware", reinstall=True)
+    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "sof-firmware", "sof-firmware", reinstall=True)
     # linux-firmware has different names on ubuntu and debian
     with open("/etc/os-release") as f:
         if "ubuntu" in f.read():
             install_package(deb_package="linux-firmware")
         else:
-            install_package("linux-firmware", "firmware-linux-free firmware-linux-nonfree", "linux-firmware", "kernel-firmware")
-    install_package("alsa-utils", "alsa-utils", "alsa-utils", "alsa-utils")
+            install_package("linux-firmware", "firmware-linux-free firmware-linux-nonfree", "linux-firmware", "kernel-firmware", "linux-firmware")
+    install_package("alsa-utils", "alsa-utils", "alsa-utils", "alsa-utils", "alsa-utils")
 
     # Force sof driver
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
