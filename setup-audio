@@ -352,8 +352,6 @@ if __name__ == "__main__":
                 apl_audio()
             case "glk":
                 sof_audio("glk")
-            case "whl":
-                sof_audio("whl")
             case "cml":
                 sof_audio("cml")
             case "jsl":
