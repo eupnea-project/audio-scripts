@@ -130,6 +130,7 @@ def sof_audio(platform):
             cpdir("/tmp/ucm-configs/tgl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
         case "jsl":
             cpdir("/tmp/ucm-configs/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
+            cpdir("/tmp/ucm-configs/jsl/sof-da7219max983", "/usr/share/alsa/ucm2/conf.d/sof-da7219max983")
 
 
 def bsw_audio():
