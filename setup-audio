@@ -16,7 +16,7 @@ def process_args():
     return parser.parse_args()
 
 
-def avs_audio(board):
+def avs_audio(board, username):
     print_status("Installing AVS")
     print_error("WARNING: AVS is VERY unstable and can cause permanent damage to your speakers! "
                 "As a safety precaution your speakers have been disabled until a fix is in place. "
@@ -51,6 +51,15 @@ def avs_audio(board):
     if not path_exists(f"/lib/modules/{bash('uname -r')}/kernel/sound/soc/intel/avs"):
         print_error("Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs "
                     "enabled. If you are on a Eupnea Project kernel, run 'manage-kernels -u --mainline' to update")
+
+    # Service for automatically switching between speakers and headphones
+    user_input = input("Would you like to install the automatic speaker and headphone switching service? (y/n)").lower()
+    if user_input == "y":
+        install_package("acpid", "acpid", "acpid", "acpid", "acpid")
+        bash("systemctl enable acpid")
+        bash("git clone https://github.com/WeirdTreeThing/avs-auto-switcher /tmp/avs-auto-switcher")
+        bash("/tmp/avs-auto-switcher/install.sh")
+        bash("systemctl --machine={username}@.host --user --now enable avs-auto-switcher")
 
 
 def apl_audio(board):
@@ -345,11 +354,11 @@ if __name__ == "__main__":
             case "bsw":
                 bsw_audio()
             case "skl":
-                avs_audio(device_board)
+                avs_audio(device_board, user_id)
             case "kbl":
-                avs_audio(device_board)
+                avs_audio(device_board, user_id)
             case "apl":
-                apl_audio(device_board)
+                apl_audio(device_board, user_id)
             case "glk":
                 sof_audio("glk")
             case "cml":
