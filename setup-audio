@@ -62,7 +62,7 @@ def avs_audio(board, username):
         bash("systemctl --machine={username}@.host --user --now enable avs-auto-switcher")
 
 
-def apl_audio(board):
+def apl_audio(board, username):
     print_status("Apollolake has two audio drivers:")
     print_status("SOF: Stable but doesn't work with headphones or mic.")
     print_status("AVS: Unstable and can cause damage to speakers but supports all audio hardware.")
@@ -81,7 +81,7 @@ def apl_audio(board):
             print_status("Using avs")
             # Remove sof modprobe config if it exists
             rmfile("/etc/modprobe.d/alsa-sof.conf")
-            avs_audio(board)
+            avs_audio(board, username)
             break
         else:
             print_error(f"Invalid option: {user_input}")
