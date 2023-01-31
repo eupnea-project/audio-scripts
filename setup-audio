@@ -140,6 +140,11 @@ def sof_audio(platform):
             cpdir("/tmp/ucm-configs/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
             cpdir("/tmp/ucm-configs/jsl/sof-da7219max98", "/usr/share/alsa/ucm2/conf.d/sof-da7219max98")
 
+    # Ubuntu moment
+    with open("/etc/os-release", "r") as ubuntu:
+        if "Ubuntu 22.04" in ubuntu.read():
+            bash("find /usr/share/alsa/ucm2/conf.d/sof-* -name "*.conf" | xargs sed -i 's/Syntax 6/Syntax 3/g'")
+
 
 def bsw_audio():
     print_status("Fixing braswell audio")
