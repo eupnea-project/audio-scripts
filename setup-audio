@@ -142,9 +142,9 @@ def sof_audio(platform):
 
     # Ubuntu 22.04 (-> PopOS too) does not support syntax v6 yet -> Downgrade to v3
     # Fedora and arch in turn do not support v3
-    with open("/etc/eupnea.json", "r") as f:
-        config = json.load(f)
-    if config["distro_version"] == "22.04":
+    with open("/etc/os-release", "r") as f:
+        config = f.read()
+    if config.__contains__("22.04"):
         for file in os.listdir("/usr/share/alsa/ucm2/conf.d/"):
             if file.startswith("sof-") and file.endswith(".conf"):
                 with open(f"/usr/share/alsa/ucm2/conf.d/{file}", "r") as file:
