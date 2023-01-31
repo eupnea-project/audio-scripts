@@ -1,9 +1,9 @@
 #!/usr/bin/env python3.10
 
+import argparse
+import json
 import os
 import sys
-import json
-import argparse
 
 
 # parse arguments from the cli. Only for testing/advanced use.
@@ -39,7 +39,7 @@ def avs_audio(board, username):
     cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
 
     # Install specific blobs for rammus and nocturne
-    if board == "rammus" or board == "shyvana" or board == "leona":
+    if board in ["rammus", "shyvana", "leona"]:
         cpdir(f"{config_path}/audio/avs/rammus-blobs", "/lib/firmware/intel/avs/skl")
     if board == "nocturne":
         cpdir(f"{config_path}/audio/avs/nocturne-blobs", "/lib/firmware/intel/avs/skl")
@@ -140,10 +140,18 @@ def sof_audio(platform):
             cpdir("/tmp/ucm-configs/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
             cpdir("/tmp/ucm-configs/jsl/sof-da7219max98", "/usr/share/alsa/ucm2/conf.d/sof-da7219max98")
 
-    # Ubuntu moment
-    with open("/etc/os-release", "r") as ubuntu:
-        if "Ubuntu 22.04" in ubuntu.read():
-            bash("find /usr/share/alsa/ucm2/conf.d/sof-* -name "*.conf" | xargs sed -i 's/Syntax 6/Syntax 3/g'")
+    # Ubuntu 22.04 (-> PopOS too) does not support syntax v6 yet -> Downgrade to v3
+    # Fedora and arch in turn do not support v3
+    with open("/etc/eupnea.json", "r") as f:
+        config = json.load(f)
+    if config["distro_version"] == "22.04":
+        for file in os.listdir("/usr/share/alsa/ucm2/conf.d/"):
+            if file.startswith("sof-") and file.endswith(".conf"):
+                with open(f"/usr/share/alsa/ucm2/conf.d/{file}", "r") as file:
+                    content = file.read()
+                content.replace("Syntax 6", "Syntax 3")
+                with open(f"/usr/share/alsa/ucm2/conf.d/{file}", "w") as file:
+                    file.write(content)
 
 
 def bsw_audio():
