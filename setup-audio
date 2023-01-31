@@ -145,13 +145,15 @@ def sof_audio(platform):
     with open("/etc/os-release", "r") as f:
         config = f.read()
     if config.__contains__("22.04"):
-        for file in os.listdir("/usr/share/alsa/ucm2/conf.d/"):
-            if file.startswith("sof-") and file.endswith(".conf"):
-                with open(f"/usr/share/alsa/ucm2/conf.d/{file}", "r") as file:
-                    content = file.read()
-                content.replace("Syntax 6", "Syntax 3")
-                with open(f"/usr/share/alsa/ucm2/conf.d/{file}", "w") as file:
-                    file.write(content)
+        for directory in os.listdir("/usr/share/alsa/ucm2/conf.d/"):
+            if directory.startswith("sof-"):
+                for conf in os.listdir(f"/usr/share/alsa/ucm2/conf.d/{directory}"):
+                    if conf.endswith(".conf"):
+                        with open(f"/usr/share/alsa/ucm2/conf.d/{conf}", "r") as f:
+                            content = f.read()
+                        content.replace("Syntax 6", "Syntax 3")
+                        with open(f"/usr/share/alsa/ucm2/conf.d/{conf}", "w") as f:
+                            f.write(content)
 
 
 def bsw_audio():
