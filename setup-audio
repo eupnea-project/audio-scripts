@@ -58,7 +58,8 @@ def avs_audio(board, username):
         install_package("acpid", "acpid", "acpid", "acpid", "acpid")
         bash("systemctl enable acpid")
         bash("git clone https://github.com/WeirdTreeThing/avs-auto-switcher /tmp/avs-auto-switcher")
-        bash("/tmp/avs-auto-switcher/install.sh")
+        cpfile("/tmp/avs-auto-switcher/avs-auto-switcher /usr/local/bin/avs-auto-switcher")
+        cpfile("/tmp/avs-auto-switcher/avs-auto-switcher.service /usr/lib/systemd/user/avs-auto-switcher.service")
         bash("systemctl --machine={username}@.host --user --now enable avs-auto-switcher")
 
 
