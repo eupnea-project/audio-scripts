@@ -141,21 +141,6 @@ def sof_audio(platform):
             cpdir("/tmp/ucm-configs/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
             cpdir("/tmp/ucm-configs/jsl/sof-da7219max98", "/usr/share/alsa/ucm2/conf.d/sof-da7219max98")
 
-    # Ubuntu 22.04 (-> PopOS too) does not support syntax v6 yet -> Downgrade to v3
-    # Fedora and arch in turn do not support v3
-    with open("/etc/os-release", "r") as f:
-        config = f.read()
-    if config.__contains__("22.04"):
-        for directory in os.listdir("/usr/share/alsa/ucm2/conf.d/"):
-            if directory.startswith("sof-"):
-                for conf in os.listdir(f"/usr/share/alsa/ucm2/conf.d/{directory}"):
-                    if conf.endswith(".conf"):
-                        with open(f"/usr/share/alsa/ucm2/conf.d/{conf}", "r") as f:
-                            content = f.read()
-                        content.replace("Syntax 6", "Syntax 3")
-                        with open(f"/usr/share/alsa/ucm2/conf.d/{conf}", "w") as f:
-                            f.write(content)
-
 
 def bsw_audio():
     print_status("Fixing braswell audio")
