@@ -307,11 +307,18 @@ if __name__ == "__main__":
     args = process_args()  # process args before elevating to root for better ux
 
     # Test internet connection
+    skip_check = False
     try:
-        bash("ping -c 1 github.com")
+        bash("which ping")
     except subprocess.CalledProcessError:
-        print_error("No internet connection! Please connect to the internet and try again.")
-        exit(1)
+        print_error("Ping not found. Skipping internet connection check.")
+        skip_check = True
+    if skip_check:
+        try:
+            bash("ping -c 1 github.com")
+        except subprocess.CalledProcessError:
+            print_error("No internet connection! Please connect to the internet and try again.")
+            exit(1)
 
     # Restart script as root
     if os.geteuid() != 0:
