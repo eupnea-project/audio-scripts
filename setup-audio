@@ -228,47 +228,48 @@ def zen2_audio(username):
 
 def install_package(arch_package: str = "", deb_package: str = "", rpm_package: str = "", suse_package: str = "",
                     void_package: str = "", reinstall: bool = False):
-    if Path("/usr/bin/pacman").exists():
+    with open("/etc/os-release", "r") as os:
+        distro = os.read()
+    if distro.__contains__("Arch Linux"):
         if reinstall:
             bash(f"pacman -S --noconfirm {arch_package}")
         else:
             bash(f"pacman -S --noconfirm --needed {arch_package}")
-    elif Path("/usr/bin/xbps-install").exists():
+    elif distro.__contains__("Void"):
         if reinstall:
             bash(f"xbps-install -fy {void_package}")
         else:
             bash(f"xbps-install -y {void_package}")
-    elif Path("/usr/bin/apt").exists():
+    elif distro.__contains__("Ubuntu") or distro.__contains__("Debian"):
         if reinstall:
             bash(f"apt-get install -y --reinstall {deb_package}")
         else:
             bash(f"apt-get install -y {deb_package}")
-    elif Path("/usr/bin/zypper").exists():
+    elif distro.__contains__("SUSE"):
         if reinstall:
             bash(f"yes | zypper in -f {suse_package}")
         else:
             bash(f"yes | zypper in {suse_package}")
-    elif Path("/usr/bin/dnf").exists():
+    elif distro.__contains__("Fedora"):
         if reinstall:
             bash(f"dnf reinstall -y {rpm_package}")
         else:
             bash(f"dnf install -y {rpm_package}")
     else:
         print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
-        exit(1)
 
 
 def update_system() -> None:
-    if Path("/usr/bin/pacman").exists():
+    if distro.__contains__("Arch Linux"):
         bash("pacman -Syu")
-    elif Path("/usr/bin/xbps-install").exists():
+    elif distro.__contains__("Void"):
         bash("xbps-install -Syu")
-    elif Path("/usr/bin/apt").exists():
+    elif distro.__contains__("Ubuntu") or distro.__contains__("Debian"):
         bash("apt-get update")
         bash("apt-get -y upgrade")
-    elif Path("/usr/bin/zypper").exists():
+    elif distro.__contains__("SUSE"):
         bash("yes | zypper up")
-    elif Path("/usr/bin/dnf").exists():
+    elif distro.__contains__("Fedora"):
         bash("dnf upgrade -y")
     else:
         print_warning("Unknown package manager! Cannot update system. Skipping")
