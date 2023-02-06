@@ -258,23 +258,6 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
         exit(1)
 
 
-def remove_package(arch_package: str = "", deb_package: str = "", rpm_package: str = "", suse_package: str = "",
-                   void_package: str = ""):
-    if Path("/usr/bin/pacman").exists():
-        bash(f"pacman -Rsn --noconfirm {arch_package}")
-    elif Path("/usr/bin/xbps-remove").exists():
-        bash(f"xbps-remove -y {void_package}")
-    elif Path("/usr/bin/apt").exists():
-        bash(f"apt-get remove -y {deb_package}")
-    elif Path("/usr/bin/zypper").exists():
-        bash(f"yes | zypper rm {suse_package}")
-    elif Path("/usr/bin/dnf").exists():
-        bash(f"dnf remove -y {rpm_package}")
-    else:
-        print_error(f"Unknown package manager! Please remove {deb_package} using your package manager.")
-        exit(1)
-
-
 def update_system() -> None:
     if Path("/usr/bin/pacman").exists():
         bash("pacman -Syu")
