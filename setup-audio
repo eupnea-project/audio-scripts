@@ -260,6 +260,8 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
 
 
 def update_system() -> None:
+    with open("/etc/os-release", "r") as os:
+        distro = os.read()
     if distro.__contains__("Arch Linux"):
         bash("pacman -Syu")
     elif distro.__contains__("Void"):
