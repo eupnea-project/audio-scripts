@@ -247,9 +247,9 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
             bash(f"apt-get install -y {deb_package}")
     elif distro.__contains__("SUSE"):
         if reinstall:
-            bash(f"yes | zypper in -f {suse_package}")
+            bash(f"zypper --non-interactive -f install {suse_package}")
         else:
-            bash(f"yes | zypper in {suse_package}")
+            bash(f"zypper --non-interactive install {suse_package}")
     elif distro.__contains__("Fedora"):
         if reinstall:
             bash(f"dnf reinstall -y {rpm_package}")
