@@ -22,9 +22,9 @@ def avs_audio(board, username):
                 "As a safety precaution your speakers have been disabled until a fix is in place. "
                 "Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
 
-    user_input = input('Type "I Understand" in all caps to continue: ')
-    while user_input != "I UNDERSTAND":
-        user_input = input('Type "I Understand" in all caps to continue: ')
+    user_input = input('Type "I Understand my speakers will not work!" in all caps to continue: ')
+    while user_input != "I UNDERSTAND MY SPEAKERS WILL NOT WORK!":
+        user_input = input('Type "I Understand my speakers will not work!" in all caps to continue: ')
 
     # Clone ucm repo
     bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
