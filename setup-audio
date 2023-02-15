@@ -13,23 +13,35 @@ def process_args():
                         help="Print more output")
     parser.add_argument("-b", "--board_name", dest="board_name", type=str, nargs=1, default=[""],
                         help="Override board name. FOR TESTING ONLY")
+    parser.add_argument("--force-avs-install", action="store_true", dest="force_avs_install", default=False,
+                        help="DANGEROUS: Force enable AVS install. MIGHT CAUSE PERMANENT DAMAGE TO SPEAKERS!")
     return parser.parse_args()
 
 
 def avs_audio(board, username):
     print_status("Installing AVS")
-    print_error("WARNING: AVS is VERY unstable and can cause permanent damage to your speakers! "
-                "As a safety precaution your speakers have been disabled until a fix is in place. "
-                "Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
+    if args.force_avs_install:
+        print_error("WARNING: AVS is VERY unstable and can cause permanent damage to your speakers!")
+        user_input = input('Type "I understand the risk of permanently damaging my speakers" in all caps to continue: ')
+        while user_input != "I UNDERSTAND THE RISK OF PERMANENTLY DAMAGING MY SPEAKERS":
+            user_input = input(
+                'Type "I understand the risk of permanently damaging my speakers" in all caps to continue: ')
+        override_avs = True
+    else:
+        print_error("WARNING: AVS is VERY unstable and can cause permanent damage to your speakers! "
+                    "As a safety precaution your speakers have been disabled until a fix is in place. "
+                    "Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
+        print_question("If you want to disable this check, restart the script with --force-avs-install")
 
-    user_input = input('Type "I Understand my speakers will not work!" in all caps to continue: ')
-    while user_input != "I UNDERSTAND MY SPEAKERS WILL NOT WORK!":
         user_input = input('Type "I Understand my speakers will not work!" in all caps to continue: ')
+        while user_input != "I UNDERSTAND MY SPEAKERS WILL NOT WORK!":
+            user_input = input('Type "I Understand my speakers will not work!" in all caps to continue: ')
+        override_avs = False
 
     # Clone ucm repo
     bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
     cpdir("/tmp/ucm-configs/avs/", "/usr/share/alsa/ucm2/conf.d/")
-    
+
     # avs blobs are from https://github.com/thesofproject/avs-topology-xml
     # max98373 and max98927 are extracted from ChromeOS recovery images
     cpdir(f"{config_path}/audio/avs/blobs", "/lib/firmware/intel/avs")
@@ -42,8 +54,8 @@ def avs_audio(board, username):
         cpdir(f"{config_path}/audio/avs/nocturne-blobs", "/lib/firmware/intel/avs/skl")
 
     # Delete topology for max98357a to prevent it from working until there is a volume limiter.
-    # Advanced users can comment the following line as long as they understand the risks.
-    rmfile("/lib/firmware/intel/avs/max98357a-tplg.bin")
+    if not override_avs:
+        rmfile("/lib/firmware/intel/avs/max98357a-tplg.bin")
 
     if not path_exists(f"/lib/modules/{bash('uname -r')}/kernel/sound/soc/intel/avs"):
         print_error("Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs "
@@ -371,7 +383,7 @@ if __name__ == "__main__":
         print_error(f"Unknown/Unsupported chromebook model: {device_board}")
         exit(1)
 
-    print_header("Audio installed successfully! Reboot to enable audio.")
+    print_header("Audio installed successfully! Reboot to finish setup.")
     input("\033[92m" + "Press ENTER to reboot or CTRL+C to cancel reboot" + "\033[0m")
     bash("reboot")
     sleep(5)
