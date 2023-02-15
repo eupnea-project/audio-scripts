@@ -57,7 +57,7 @@ def avs_audio(board, username):
         bash("git clone https://github.com/WeirdTreeThing/avs-auto-switcher /tmp/avs-auto-switcher")
         cpfile("/tmp/avs-auto-switcher/avs-auto-switcher", "/usr/local/bin/avs-auto-switcher")
         cpfile("/tmp/avs-auto-switcher/avs-auto-switcher.service", "/usr/lib/systemd/user/avs-auto-switcher.service")
-        bash(f"systemctl --machine={username}@.host --user --now enable avs-auto-switcher")
+        bash(f"systemctl --global enable --now avs-auto-switcher.service")
 
 
 def apl_audio(board, username):
