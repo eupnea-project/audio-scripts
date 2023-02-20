@@ -9,7 +9,8 @@
 1. `python 3.10`
 
 # Supported distros
-1. Ubuntu 22.10
+1. Ubuntu 22.10 
+2. Ubuntu 22.04: needs newer libasound2 and libasound2-data packages. Extract the 22.10 packages or use this [backport](https://github.com/eupnea-linux/apt-repo/tree/gh-pages/debian_ubuntu/pool/main/liba/libasound2-eupnea). Backports are not needed on Pop!_OS
 2. Debian testing
 3. Fedora 37
 4. OpenSUSE
