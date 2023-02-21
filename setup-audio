@@ -247,29 +247,30 @@ def zen2_audio(username):
 
 def install_package(arch_package: str = "", deb_package: str = "", rpm_package: str = "", suse_package: str = "",
                     void_package: str = "", reinstall: bool = False):
-    with open("/etc/os-release", "r") as os:
-        distro = os.read()
-    if distro.__contains__("Arch Linux"):
+    with open("/etc/os-release", "r") as file:
+        distro = file.read()
+    if distro.lower().__contains__(
+            "arch"):  # might accidentally catch architecture stuff, but needed to catch arch derivatives
         if reinstall:
             bash(f"pacman -S --noconfirm {arch_package}")
         else:
             bash(f"pacman -S --noconfirm --needed {arch_package}")
-    elif distro.__contains__("Void"):
+    elif distro.lower().__contains__("void"):
         if reinstall:
             bash(f"xbps-install -fy {void_package}")
         else:
             bash(f"xbps-install -y {void_package}")
-    elif distro.__contains__("Ubuntu") or distro.__contains__("Debian"):
+    elif distro.lower().__contains__("ubuntu") or distro.lower().__contains__("debian"):
         if reinstall:
             bash(f"apt-get install -y --reinstall {deb_package}")
         else:
             bash(f"apt-get install -y {deb_package}")
-    elif distro.__contains__("SUSE"):
+    elif distro.lower().__contains__("suse"):
         if reinstall:
             bash(f"zypper --non-interactive -f install {suse_package}")
         else:
             bash(f"zypper --non-interactive install {suse_package}")
-    elif distro.__contains__("Fedora"):
+    elif distro.lower().__contains__("fedora"):
         if reinstall:
             bash(f"dnf reinstall -y {rpm_package}")
         else:
@@ -281,16 +282,17 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
 def update_system() -> None:
     with open("/etc/os-release", "r") as os:
         distro = os.read()
-    if distro.__contains__("Arch Linux"):
+    if distro.lower().__contains__(
+            "arch"):  # might accidentally catch architecture stuff, but needed to catch arch derivatives
         bash("pacman -Syu")
-    elif distro.__contains__("Void"):
+    elif distro.lower().__contains__("void"):
         bash("xbps-install -Syu")
-    elif distro.__contains__("Ubuntu") or distro.__contains__("Debian"):
+    elif distro.lower().__contains__("ubuntu") or distro.lower().__contains__("debian"):
         bash("apt-get update")
         bash("apt-get -y upgrade")
-    elif distro.__contains__("SUSE"):
+    elif distro.lower().__contains__("suse"):
         bash("yes | zypper up")
-    elif distro.__contains__("Fedora"):
+    elif distro.lower().__contains__("fedora"):
         bash("dnf upgrade -y")
     else:
         print_warning("Unknown package manager! Cannot update system. Skipping")
