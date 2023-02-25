@@ -275,6 +275,21 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
             bash(f"dnf reinstall -y {rpm_package}")
         else:
             bash(f"dnf install -y {rpm_package}")
+    elif Path("/usr/bin/pacman").exists(): # If detection by /etc/os-release fails, fallback to detecting installed package managers
+        if reinstall:                      # Only for derivitaves using apt, dnf, or pacman
+            bash(f"pacman -S --noconfirm {arch_package}")
+        else:
+            bash(f"pacman -S --noconfirm --needed {arch_package}")
+    elif Path("/usr/bin/apt").exists():
+        if reinstall:
+            bash(f"apt-get install -y --reinstall {deb_package}")
+        else:
+            bash(f"apt-get install -y {deb_package}")
+    elif Path("/usr/bin/dnf").exists():
+        if reinstall:
+            bash(f"dnf reinstall -y {rpm_package}")
+        else:
+            bash(f"dnf install -y {rpm_package}")
     else:
         print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
 
