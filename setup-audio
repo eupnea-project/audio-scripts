@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import sys
+import subprocess as sp
 from urllib.request import urlretrieve
 
 
@@ -22,21 +23,21 @@ def process_args():
 def avs_audio(board, username):
     print_status("Installing AVS")
     if args.force_avs_install:
-        print_error("WARNING: AVS is VERY unstable and can cause permanent damage to your speakers!")
+        print_error("WARNING: AVS is unstable and can cause permanent damage to your speakers if your device has max98357a!")
         user_input = input('Type "I understand the risk of permanently damaging my speakers" in all caps to continue: ')
         while user_input != "I UNDERSTAND THE RISK OF PERMANENTLY DAMAGING MY SPEAKERS":
             user_input = input(
                 'Type "I understand the risk of permanently damaging my speakers" in all caps to continue: ')
         override_avs = True
     else:
-        print_error("WARNING: AVS is VERY unstable and can cause permanent damage to your speakers! "
-                    "As a safety precaution your speakers have been disabled until a fix is in place. "
+        print_error("WARNING: AVS is unstable and can cause permanent damage to your speakers if your device has max98357a! "
+                    "As a safety precaution devices with max98357a have speakers disabled until a fix is in place. "
                     "Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
         print_question("If you want to disable this check, restart the script with --force-avs-install")
 
-        user_input = input('Type "I Understand my speakers will not work!" in all caps to continue: ')
-        while user_input != "I UNDERSTAND MY SPEAKERS WILL NOT WORK!":
-            user_input = input('Type "I Understand my speakers will not work!" in all caps to continue: ')
+        user_input = input('Type "I Understand my speakers will not work if my device has max98357a!" in all caps to continue: ')
+        while user_input != "I UNDERSTAND MY SPEAKERS WILL NOT WORK IF MY DEVICE HAS MAX98357A!":
+            user_input = input('Type "I Understand my speakers will not work if my device has max98357a!" in all caps to continue: ')
         override_avs = False
 
     # Clone ucm repo
@@ -44,7 +45,6 @@ def avs_audio(board, username):
     cpdir("/tmp/ucm-configs/avs/", "/usr/share/alsa/ucm2/conf.d/")
 
     # avs tplg is from https://github.com/thesofproject/avs-topology-xml
-    # max98373 and max98927 are extracted from ChromeOS recovery images
     cpdir(f"{config_path}/audio/avs/tplg", "/lib/firmware/intel/avs")
     cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
 
@@ -56,10 +56,10 @@ def avs_audio(board, username):
 
     # Install specific blobs for rammus and nocturne
     if board in ["rammus", "shyvana", "leona"]:
-        cpdir(f"{config_path}/audio/avs/rammus-blobs", "/lib/firmware/intel/avs/skl")
+        extract_blobs("rammus")
         print_error("WARNING: You will need a chromeos kernel for speakers to work!")
     if board == "nocturne":
-        cpdir(f"{config_path}/audio/avs/nocturne-blobs", "/lib/firmware/intel/avs/skl")
+        extract_blobs("nocturne")
         print_error("WARNING: You will need a chromeos kernel for speakers to work!")
 
     # Delete topology for max98357a to prevent it from working until there is a volume limiter.
@@ -68,7 +68,7 @@ def avs_audio(board, username):
 
     if not path_exists(f"/lib/modules/{bash('uname -r')}/kernel/sound/soc/intel/avs"):
         print_error("Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs "
-                    "enabled. If you are on a Eupnea Project kernel, run 'manage-kernels -u --mainline' to update")
+                    "enabled. If you are on a Eupnea Project kernel update your system.")
 
     # Service for automatically switching between speakers and headphones
     user_input = input("Would you like to install the automatic speaker and headphone switching service? (y/n)").lower()
@@ -159,6 +159,8 @@ def sof_audio(platform):
         case "jsl":
             cpdir("/tmp/ucm-configs/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
             cpdir("/tmp/ucm-configs/jsl/sof-da7219max98", "/usr/share/alsa/ucm2/conf.d/sof-da7219max98")
+            # JSL needs topology from ChromeOS
+            extract_blobs("jsl")
 
 
 def bsw_audio():
@@ -292,6 +294,95 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
             bash(f"dnf install -y {rpm_package}")
     else:
         print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
+
+
+def extract_blobs(platform) -> None:
+    if platform in ["rammus", "nocturne"]: # rammus and nocturne need same blobs, just from different recovery image
+        NOCTURNE_URL = "https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_nocturne_recovery_stable-channel_mp.bin.zip"
+        NOCTURNE_BIN = "chromeos_15278.64.0_nocturne_recovery_stable-channel_mp.bin"
+        RAMMUS_URL = "https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_rammus_recovery_stable-channel_mp-v2.bin.zip"
+        RAMMUS_BIN = "chromeos_15278.64.0_rammus_recovery_stable-channel_mp-v2.bin"
+        print_question("Your device needs special firmware files for speakers to work which need to be extracted from a ChromeOS recovery image. "
+                       "You will need around 6GB of free space to download and extract it")
+        user_input = input("Would you like to download and extract the firmware? [y/n] ")
+        if user_input.lower == "y":
+            print_status("Installing deps")
+            install_package("unzip", "unzip", "unzip", "unzip", "unzip")
+            install_package("multipath-tools", "multipath-tools", "multipath-tools", "multipath-tools", "multipath-tools")
+            if "rammus" in platform:
+                print_status("Downloading")
+                urlretrieve(RAMMUS_URL, filename="/tmp/rammus.bin.zip") # Download to /var/tmp
+                print_status("Extracting recovery image")
+                bash("unzip /var/tmp/rammus.bin.zip -d /var/tmp")
+                rmfile("/var/tmp/rammus.bin.zip")
+                loop_dev = str(sp.check_output(f"kpartx -av /var/tmp/{RAMMUS_BIN}"))[8:14]
+                # Handle 1 digit loop devs
+                if loop_dev[5] == "p":
+                    loop_dev = loop_dev[:5]
+                mkdir("/mnt/cros")
+                bash(f"mount /dev/{loop_dev}p3 /mnt/cros -o ro")
+                print_status("Extracting firmware")
+                cpdir("/mnt/cros/lib/firmware/intel/avs", "/lib/firmware/intel/avs")
+                print_status("Cleaning up")
+                bash("umount /mnt/cros")
+                rmdir("/mnt/cros")
+                bash(f"kpartx -d /dev/{loop_dev}")
+                bash(f"losetup -d /dev/{loop_dev}")
+                rmfile(f"/var/tmp/{RAMMUS_BIN}")
+            else:
+                print_status("Downloading")
+                urlretrieve(NOCTURNE_URL, filename="/var/tmp/nocturne.bin.zip")
+                print_status("Extracting recovery image")
+                bash("unzip /var/tmp/nocturne.bin.zip -d /var/tmp")
+                rmfile("/var/tmp/nocturne.bin.zip")
+                loop_dev = str(sp.check_output(f"kpartx -av /var/tmp/{NOCTURNE_BIN}"))[8:14]
+                # Handle 1 digit loop devs
+                if loop_dev[5] == "p":
+                    loop_dev = loop_dev[:5]
+                mkdir("/mnt/cros")
+                bash(f"mount /dev/{loop_dev}p3 /mnt/cros -o ro")
+                print_status("Extracting firmware")
+                cpdir("/mnt/cros/lib/firmware/intel/avs", "/lib/firmware/intel/avs")
+                print_status("Cleaning up")
+                bash("umount /mnt/cros")
+                rmdir("/mnt/cros")
+                bash(f"kpartx -d /dev/{loop_dev}")
+                bash(f"losetup -d /dev/{loop_dev}")
+                rmfile(f"/var/tmp/{NOCTURNE_BIN}")
+        else:
+            print_status("Not installing firmware, speakers will not work!")
+    elif "jsl" in platform:
+        print_question("Your device needs a working topology file for speakers to work which need to be extracted from a ChromeOS recovery image. "
+                       "You will need around 6GB of free space to download and extract it")
+        user_input = input("Would you like to download and extract the topology? [y/n] ")
+        if user_input.lower == "y":
+            print_status("Installing deps")
+            install_package("unzip", "unzip", "unzip", "unzip", "unzip")
+            install_package("multipath-tools", "multipath-tools", "multipath-tools", "multipath-tools", "multipath-tools")
+            DEDEDE_URL = "https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_dedede_recovery_stable-channel_mp-v27.bin.zip"
+            DEDEDE_BIN = "https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_dedede_recovery_stable-channel_mp-v27.bin"
+            print_status("Downloading")
+            urlretrieve(DEDEDE_URL, filename="/var/tmp/dedede.bin.zip")
+            print_status("Extracting recovery image")
+            bash("unzip /var/tmp/dedede.bin.zip -d /var/tmp")
+            rmfile("/var/tmp/dedede.bin.zip")
+            loop_dev = str(sp.check_output(f"kpartx -av /var/tmp{DEDEDE_BIN}"))[8:14]
+            # Handle 1 digit loop devs
+            if loop_dev[5] == "p":
+                loop_dev = loop_dev[:5]
+            mkdir("/mnt/cros")
+            bash(f"mount /dev/{loop_dev}p3 /mnt/cros -o ro")
+            print_status("Extracting firmware")
+            # Remove old topology
+            rmfile("/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg")
+            # Install new topology
+            cpfile("/mnt/cros/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg", "/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg")
+            print_status("Cleaning up")
+            bash("umount /mnt/cros")
+            rmdir("/mnt/cros")
+            bash(f"kpartx -d /dev/{loop_dev}")
+            bash(f"losetup -d /dev/{loop_dev}")
+            rmfile(f"/var/tmp/{NOCTURNE_BIN}")
 
 
 def update_system() -> None:
