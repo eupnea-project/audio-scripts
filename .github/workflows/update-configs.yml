@@ -1,5 +1,5 @@
 # This script updates misc configs that the script needs to remove the need to git clone the repos when running the script
-name: Updating misc configs
+name: Updating configs
 on:
   schedule:
     - cron: "10 0 * * *" # run at the start of every day after updating functions.py
@@ -32,18 +32,17 @@ jobs:
           cp -r alsa-ucm-conf/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf configs/audio/amd/ucms/
           
           # avs auto switcher
-          cp avs-auto-switcher/avs-auto-switcher configs/audio/avs/auto_switcher/
-          cp avs-auto-switcher/avs-auto-switcher.service configs/audio/avs/auto_switcher/
+          cp avs-auto-switcher/avs-auto-switcher configs/audio/avs/auto-switcher/
+          cp avs-auto-switcher/avs-auto-switcher.service configs/audio/avs/auto-switcher/
+
+      - name: Deleting git clones
+        run: |
+          rm -rf ./ucm-configs
+          rm -rf ./avs-auto-switcher
+          rm -rf ./alsa-ucm-conf
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
-          commit_message: Update functions.py
-
-          # Optional glob pattern of files which should be added to the commit
-          # Defaults to all (.)
-          # See the `pathspec`-documentation for git
-          # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
-          # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
-          file_pattern: 'functions.py'
+          commit_message: Update configs
