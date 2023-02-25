@@ -1,0 +1,77 @@
+#!/bin/bash
+
+coproc acpi_listen
+trap 'kill $COPROC_PID' EXIT
+
+[[ -n $(pactl list sinks short | grep avs_max98357a) ]] && speakers=$(pactl list sinks short | grep alsa_output.platform-avs_max98357a | cut -f 2)
+[[ -n $(pactl list sinks short | grep avs_max98927) ]] && speakers=$(pactl list sinks short | grep alsa_output.platform-avs_max98927 | cut -f 2)
+[[ -n $(pactl list sinks short | grep avs_max98373) ]] && speakers=$(pactl list sinks short | grep alsa_output.platform-avs_max98373 | cut -f 2)
+[[ -n $(pactl list sinks short | grep avs_da7219) ]] && headphones=$(pactl list sinks short | grep alsa_output.platform-avs_da7219 | cut -f 2) && headset=$(pactl list sources short | grep alsa_input.platform-avs_da7219 | cut -f 2)
+[[ -n $(pactl list sinks short | grep avs_nau8825) ]] && headphones=$(pactl list sinks short | grep alsa_output.platform-avs_nau8825 | cut -f 2) && headset=$(pactl list sources short | grep alsa_input.platform-avs_nau8825 | cut -f 2)
+dmic=$(pactl list sources short | grep alsa_input.platform-avs_dmic | cut -f 2)
+
+function event_handler {
+    case $1 in
+	    jack/*)
+		    case $2 in
+			    HEADPHONE)
+				    case $3 in
+					    plug)
+						    headphone_plugged=1
+						    ;;
+					    unplug)
+						    headphone_plugged=0
+						    ;;
+				    esac
+				    ;;
+			    MICROPHONE)
+				    case $3 in
+					    plug)
+						    mic_plugged=1
+						    ;;
+					    unplug)
+						    mic_plugged=0
+						    ;;
+				    esac
+
+				    ;;
+			    LINEOUT)
+				    case $3 in
+					    plug)
+						    lineout_plugged=1
+						    ;;
+					    unplug)
+						    lineout_plugged=0
+						    ;;
+				    esac
+
+				    ;;
+		    esac
+		    ;;
+	    *)
+		    echo ""
+		    ;;
+    esac
+
+    [[ $headphone_plugged -eq 1 || $lineout_plugged -eq 1 ]] && use_headphones=1 || use_headphones=0
+    case $use_headphones in
+	    1)
+		    [[ ! "$(pactl info | grep "Default Sink:" | cut -d " " -f 3)" == "$headphones" ]] && pactl set-default-sink $headphones
+		    ;;
+	    0)
+		    [[ ! "$(pactl info | grep "Default Sink:" | cut -d " " -f 3)" == "$speakers" ]] && pactl set-default-sink $speakers
+		    ;;
+    esac
+    case $mic_plugged in
+	    1)
+		    [[ ! "$(pactl info | grep "Default Source:" | cut -d " " -f 3)" == "$headset" ]] && pactl set-default-source $headset
+		    ;;
+	    0)
+		    [[ ! "$(pactl info | grep "Default Source:" | cut -d " " -f 3)" == "$dmic" ]] && pactl set-default-source $dmic
+		    ;;
+    esac
+}
+
+while read -u "${COPROC[0]}" -a event; do
+    event_handler "${event[@]}"
+done

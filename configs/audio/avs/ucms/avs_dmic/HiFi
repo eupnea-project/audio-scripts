@@ -1,0 +1,24 @@
+SectionVerb {
+	Value {
+		FullySpecifiedUCM "1"
+	}
+	EnableSequence [
+	]
+	DisableSequence [
+	]
+}
+
+SectionDevice."Internal Mic" {
+	Comment "Internal Microphone"
+
+	Value {
+		CapturePCM "hw:avsdmic,2"
+		CaptureChannels 4
+		CaptureChannelMap "0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1"
+		IntrinsicSensitivity "-2600"
+	}
+	EnableSequence [
+	]
+	DisableSequence [
+	]
+}

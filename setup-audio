@@ -42,14 +42,14 @@ def avs_audio(board, username):
                 'Type "I Understand my speakers will not work if my device has max98357a!" in all caps to continue: ')
         override_avs = False
 
-    # Clone ucm repo
-    bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
-    cpdir("/tmp/ucm-configs/avs/", "/usr/share/alsa/ucm2/conf.d/")
+    # Copy ucms
+    cpdir(f"{config_path}/audio/avs/ucms", "/usr/share/alsa/ucm2/conf.d/")
 
     # avs tplg is from https://github.com/thesofproject/avs-topology-xml
     cpdir(f"{config_path}/audio/avs/tplg", "/lib/firmware/intel/avs")
     cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
 
+    # TODO: Remove when upstream packages get updated
     # avs dsp firmware recently got merged upstream but is not packaged in any distro yet
     mkdir("/lib/firmware/intel/avs/skl")
     mkdir("/lib/firmware/intel/avs/apl")
@@ -77,11 +77,11 @@ def avs_audio(board, username):
     # Service for automatically switching between speakers and headphones
     user_input = input("Would you like to install the automatic speaker and headphone switching service? (y/n)").lower()
     if user_input == "y":
+        cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher", "/usr/local/bin/avs-auto-switcher")
+        cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher.service",
+               "/usr/lib/systemd/user/avs-auto-switcher.service")
         install_package("acpid", "acpid", "acpid", "acpid", "acpid")
         bash("systemctl enable acpid")
-        bash("git clone https://github.com/WeirdTreeThing/avs-auto-switcher /tmp/avs-auto-switcher")
-        cpfile("/tmp/avs-auto-switcher/avs-auto-switcher", "/usr/local/bin/avs-auto-switcher")
-        cpfile("/tmp/avs-auto-switcher/avs-auto-switcher.service", "/usr/lib/systemd/user/avs-auto-switcher.service")
         bash(f"systemctl --machine={username}@.host --user --now enable avs-auto-switcher")
 
 
@@ -142,28 +142,24 @@ def sof_audio(platform):
     # Force sof driver
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
 
-    # Delete repo just in case it already exists
-    rmdir("/tmp/ucm-configs")
-    # Clone ucm repo
-    bash("git clone https://github.com/eupnea-linux/ucm-configs /tmp/ucm-configs")
     match platform:
         case "glk":
             # Most glk devices use da7219/max98357a
-            cpdir("/tmp/ucm-configs/glk/sof-glkda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma")
+            cpdir(f"{config_path}/audio/sof/ucms/glk/sof-glkda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma")
             # Some glk devices use cs42l42
-            cpdir("/tmp/ucm-configs/glk/sof-cs42l42", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42")
+            cpdir(f"{config_path}/audio/sof/ucms/glk/sof-cs42l42", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42")
             # Same thing for rt5682
-            cpdir("/tmp/ucm-configs/glk/sof-glkrt5682ma", "/usr/share/alsa/ucm2/conf.d/sof-glkrt5682ma")
+            cpdir(f"{config_path}/audio/sof/ucms/glk/sof-glkrt5682ma", "/usr/share/alsa/ucm2/conf.d/sof-glkrt5682ma")
         case "cml":
-            cpdir("/tmp/ucm-configs/cml/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
-            cpdir("/tmp/ucm-configs/cml/sof-cmlda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-cmlda7219ma")
-            cpdir("/tmp/ucm-configs/cml/sof-cml_rt1011_", "/usr/share/alsa/ucm2/conf.d/sof-cml_rt1011_")
+            cpdir(f"{config_path}/audio/sof/ucms/cml/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
+            cpdir(f"{config_path}/audio/sof/ucms/cml/sof-cmlda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-cmlda7219ma")
+            cpdir(f"{config_path}/audio/sof/ucms/cml/sof-cml_rt1011_", "/usr/share/alsa/ucm2/conf.d/sof-cml_rt1011_")
         case "tgl":
-            cpdir("/tmp/ucm-configs/tgl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
+            cpdir(f"{config_path}/audio/sof/ucms/tgl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
         case "jsl":
-            cpdir("/tmp/ucm-configs/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
-            cpdir("/tmp/ucm-configs/jsl/sof-da7219max98", "/usr/share/alsa/ucm2/conf.d/sof-da7219max98")
-            # JSL needs topology from ChromeOS
+            cpdir(f"{config_path}/audio/sof/ucms/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
+            cpdir(f"{config_path}/audio/sof/ucms/jsl/sof-da7219max98", "/usr/share/alsa/ucm2/conf.d/sof-da7219max98")
+            # JSL needs proprietary topology from ChromeOS
             extract_blobs("jsl")
 
 
@@ -233,17 +229,13 @@ def zen2_audio(username):
     rmdir("/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/")
     rmdir("/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98")
 
-    # clone repo
-    bash("git clone --depth=1 https://github.com/alsa-project/alsa-ucm-conf/ /tmp/eupnea-audio")
-
     # Make directories
     mkdir("/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/", create_parents=True)
     mkdir("/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98", create_parents=True)
 
     # copy ucm configs
-    cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/HiFi.conf",
-           "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/HiFi.conf")
-    cpfile("/tmp/eupnea-audio/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf",
+    cpfile(f"{config_path}/audio/amd/ucms/HiFi.conf", "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/HiFi.conf")
+    cpfile(f"{config_path}/audio/amd/ucms/acp3xalc5682m98.conf",
            "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
     bash("cd /usr/share/alsa/ucm2/conf.d/acp3xalc5682m98 ; ln ../../AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
 
@@ -285,6 +277,8 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
         print_error(f"Unknown package manager! Please install {deb_package} using your package manager.")
 
 
+# Some devices need special firmware files for speakers to work, which is proprietary and non-redistributable
+# -> extract it locally from a ChromeOS recovery image
 def extract_blobs(platform) -> None:
     if platform not in ["rammus", "nocturne", "jsl"]:
         return

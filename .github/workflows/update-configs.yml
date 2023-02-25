@@ -1,0 +1,49 @@
+# This script updates misc configs that the script needs to remove the need to git clone the repos when running the script
+name: Updating misc configs
+on:
+  schedule:
+    - cron: "10 0 * * *" # run at the start of every day after updating functions.py
+  workflow_dispatch:
+
+jobs:
+  update-configs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+
+      - name: Cloning repos
+        run: |
+          git clone --depth=1 https://github.com/eupnea-linux/ucm-configs
+          git clone --depth=1 https://github.com/WeirdTreeThing/avs-auto-switcher
+          git clone --depth=1 https://github.com/alsa-project/alsa-ucm-conf
+
+      - name: Updating configs
+        run: |
+          # eupnea ucms
+          cp -r ucm-configs/avs/* configs/audio/avs/ucms/
+          cp -r ucm-configs/cml/* configs/audio/sof/ucms/cml/
+          cp -r ucm-configs/glk/* configs/audio/sof/ucms/glk/
+          cp -r ucm-configs/jsl/* configs/audio/sof/ucms/jsl/
+          cp -r ucm-configs/tgl/* configs/audio/sof/ucms/tgl/
+          
+          # alsa ucms
+          cp -r alsa-ucm-conf/ucm2/AMD/acp3xalc5682m98/HiFi.conf configs/audio/amd/ucms/
+          cp -r alsa-ucm-conf/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf configs/audio/amd/ucms/
+          
+          # avs auto switcher
+          cp avs-auto-switcher/avs-auto-switcher configs/audio/avs/auto_switcher/
+          cp avs-auto-switcher/avs-auto-switcher.service configs/audio/avs/auto_switcher/
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: Update functions.py
+
+          # Optional glob pattern of files which should be added to the commit
+          # Defaults to all (.)
+          # See the `pathspec`-documentation for git
+          # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
+          # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
+          file_pattern: 'functions.py'
