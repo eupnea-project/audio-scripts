@@ -1,0 +1,10 @@
+[Unit]
+Description=Automatically switch between avs headphones and speakers
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/local/bin/avs-auto-switcher
+
+[Install]
+WantedBy=graphical-session.target
