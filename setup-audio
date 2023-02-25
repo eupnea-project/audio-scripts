@@ -296,7 +296,7 @@ def extract_blobs(platform) -> None:
         print_warning("Not installing firmware, speakers will not work!")
     else:
         print_status("Deleting old files")
-        bash("rm -f /var/tmp/chromeos_*_recovery_stable-channel_mp-v2.bin")
+        bash("rm -f /var/tmp/chromeos_*_recovery_stable-channel*.bin")
         rmdir("/mnt/chromeos-recovery")
         rmfile("/tmp/recovery.bin.zip")
 
@@ -347,7 +347,7 @@ def extract_blobs(platform) -> None:
         bash("umount -lf /mnt/chromeos-recovery")
         rmdir("/mnt/chromeos-recovery", keep_dir=False)
         bash(f"losetup -d /dev/{loop_dev}")
-        bash("rm -f /var/tmp/chromeos_*_recovery_stable-channel_mp-v2.bin")
+        bash("rm -f /var/tmp/chromeos_*_recovery_stable-channel*.bin")
         rmdir("/mnt/chromeos-recovery")
         rmfile("/tmp/recovery.bin.zip")
 
