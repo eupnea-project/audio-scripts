@@ -75,8 +75,8 @@ def avs_audio(board, username):
                     "enabled. If you are on a Eupnea Project kernel update your system.")
 
     # Service for automatically switching between speakers and headphones
-    user_input = input("Would you like to install the automatic speaker and headphone switching service? (y/n)").lower()
-    if user_input == "y":
+    user_input = input("Would you like to install the automatic speaker and headphone switching service? (Y/n)").lower()
+    if user_input != "n":
         cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher", "/usr/local/bin/avs-auto-switcher")
         cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher.service",
                "/usr/lib/systemd/user/avs-auto-switcher.service")
