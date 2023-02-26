@@ -33,6 +33,7 @@ jobs:
           
           # avs auto switcher
           cp avs-auto-switcher/avs-auto-switcher configs/audio/avs/auto-switcher/
+          chmod +x configs/audio/avs/auto-switcher/avs-auto-switcher
           cp avs-auto-switcher/avs-auto-switcher.service configs/audio/avs/auto-switcher/
 
       - name: Deleting git clones
