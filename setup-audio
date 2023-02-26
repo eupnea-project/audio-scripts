@@ -282,7 +282,7 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
 def extract_blobs(platform) -> None:
     if platform not in ["rammus", "nocturne", "jsl"]:
         return
-    print_question("Your device needs special firmware files for speakers to work which need to be extracted from a "
+    print_question("Your device needs special firmware files for speakers to work which needs to be extracted from a "
                    "ChromeOS recovery image. The recovery image is about 2GB in size. You will need about 6GB of free"
                    " space to download and extract it.")
     user_input = input("Would you like to download and extract the firmware? [Y/n] ")
