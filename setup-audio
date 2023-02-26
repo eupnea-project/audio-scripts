@@ -314,7 +314,7 @@ def extract_blobs(platform) -> None:
         print_status("Mounting image")
         loop_dev = bash("losetup -fP --show /var/tmp/chromeos_*_recovery_stable-channel_mp-v2.bin")
         mkdir("/mnt/chromeos-recovery")
-        bash(f"mount /dev/{loop_dev}p3 /mnt/chromeos-recovery -o ro")
+        bash(f"mount {loop_dev}p3 /mnt/chromeos-recovery -o ro")
 
         print_status("Extracting firmware")
         if platform == "jsl":
@@ -340,7 +340,7 @@ def extract_blobs(platform) -> None:
         print_status("Cleaning up")
         bash("umount -lf /mnt/chromeos-recovery")
         rmdir("/mnt/chromeos-recovery", keep_dir=False)
-        bash(f"losetup -d /dev/{loop_dev}")
+        bash(f"losetup -d {loop_dev}")
         bash("rm -f /var/tmp/chromeos_*_recovery_stable-channel*.bin")
         rmdir("/mnt/chromeos-recovery")
         rmfile("/tmp/recovery.bin.zip")
