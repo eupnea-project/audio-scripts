@@ -299,17 +299,14 @@ def extract_blobs(platform) -> None:
 
         print_status("Downloading recovery image")
         if platform == "rammus":
-            download_file(
-                "https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_rammus_recovery_stable-channel_mp-v2.bin.zip",
-                "/var/tmp/recovery.bin.zip")
+            download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_rammus_recovery_"
+                          "stable-channel_mp-v2.bin.zip", "/var/tmp/recovery.bin.zip")
         elif platform == "jsl":
-            download_file(
-                "https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_jsl_recovery_stable-channel_mp-v2.bin.zip",
-                "/var/tmp/recovery.bin.zip")
+            download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_jsl_recovery_"
+                          "stable-channel_mp-v2.bin.zip", "/var/tmp/recovery.bin.zip")
         else:  # nocturne
-            download_file(
-                "https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_nocturne_recovery_stable-channel_mp.bin.zip",
-                "/var/tmp/recovery.bin.zip")
+            download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_nocturne_"
+                          "recovery_stable-channel_mp.bin.zip", "/var/tmp/recovery.bin.zip")
 
         print_status("Extracting recovery image")
         bash("unzip /var/tmp/recovery.bin.zip -d /var/tmp")
