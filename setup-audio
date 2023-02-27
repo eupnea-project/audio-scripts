@@ -302,8 +302,8 @@ def extract_blobs(platform) -> None:
             download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_rammus_recovery_"
                           "stable-channel_mp-v2.bin.zip", "/var/tmp/recovery.bin.zip")
         elif platform == "jsl":
-            download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_jsl_recovery_"
-                          "stable-channel_mp-v2.bin.zip", "/var/tmp/recovery.bin.zip")
+            download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_dedede_recovery_stable"
+                          "-channel_mp-v27.bin.zip", "/var/tmp/recovery.bin.zip")
         else:  # nocturne
             download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_nocturne_"
                           "recovery_stable-channel_mp.bin.zip", "/var/tmp/recovery.bin.zip")
