@@ -312,7 +312,7 @@ def extract_blobs(platform) -> None:
         bash("unzip /var/tmp/recovery.bin.zip -d /var/tmp")
 
         print_status("Mounting image")
-        loop_dev = bash("losetup -fP --show /var/tmp/chromeos_*_recovery_stable-channel_mp-v2.bin")
+        loop_dev = bash("losetup -fP --show /var/tmp/chromeos_recovery_*.bin")
         mkdir("/mnt/chromeos-recovery")
         bash(f"mount {loop_dev}p3 /mnt/chromeos-recovery -o ro")
 
