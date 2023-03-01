@@ -321,7 +321,7 @@ def extract_blobs(platform) -> None:
             # Remove old topology
             rmfile("/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg")
             # Install new topology
-            cpfile("/mnt/chromeos-recoverylib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg",
+            cpfile("/mnt/chromeos-recovery/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg",
                    "/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg")
         else:  # rammus and nocturne
             # extract avs firmware
