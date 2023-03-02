@@ -335,7 +335,7 @@ def extract_blobs(platform) -> None:
             cpdir("/mnt/chromeos-recovery/lib/firmware/intel/avs", "/lib/firmware/intel/avs")
         elif platform == "nocturne":
             mkdir("/usr/lib/nocturne-dsm/", create_parents=True)
-            cpfile("/mnt/chromeos-recovery/opt/google/dsm/dsmparam.bin", "/usr/lib/nocturne-dsm/dsmparam.bin`")
+            cpfile("/mnt/chromeos-recovery/opt/google/dsm/dsmparam.bin", "/usr/lib/nocturne-dsm/dsmparam.bin")
 
         print_status("Cleaning up")
         bash("umount -lf /mnt/chromeos-recovery")
