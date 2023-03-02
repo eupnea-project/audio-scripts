@@ -78,6 +78,7 @@ def avs_audio(board, username):
     user_input = input("Would you like to install the automatic speaker and headphone switching service? (Y/n)").lower()
     if user_input != "n":
         cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher", "/usr/local/bin/avs-auto-switcher")
+        bash("chmod +x /usr/local/bin/avs-auto-switcher") # TODO: figure out why this isn't executable by default
         cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher.service",
                "/usr/lib/systemd/user/avs-auto-switcher.service")
         install_package("acpid", "acpid", "acpid", "acpid", "acpid")
