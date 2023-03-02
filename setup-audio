@@ -332,7 +332,7 @@ def extract_blobs(platform) -> None:
         if platform == "rammus":
             mkdir("/usr/lib/rammus-dsm/", create_parents=True)
             cpfile("/mnt/chromeos-recovery/opt/google/dsm/shyvana/dsmparam.bin",
-                   "/usr/lib/rammus-dsm/dsmparam.bin`")  # Shyvana and leona have the same dsmparam.bin file
+                   "/usr/lib/rammus-dsm/dsmparam.bin")  # Shyvana and leona have the same dsmparam.bin file
             cpdir("/mnt/chromeos-recovery/lib/firmware/intel/avs", "/lib/firmware/intel/avs")
         elif platform == "nocturne":
             mkdir("/usr/lib/nocturne-dsm/", create_parents=True)
