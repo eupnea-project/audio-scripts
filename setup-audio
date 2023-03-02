@@ -417,6 +417,7 @@ if __name__ == "__main__":
     # Remove old files
     rmdir("/tmp/eupnea-audio")
     mkdir("/tmp/eupnea-audio")
+    rmfile(".stop_download_progress")
 
     # Important message
     print_warning("WARNING: this audio script is not fully functional yet!")
