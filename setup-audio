@@ -82,6 +82,10 @@ def avs_audio(board, username):
         cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher.service",
                "/usr/lib/systemd/user/avs-auto-switcher.service")
         install_package("acpid", "acpid", "acpid", "acpid", "acpid")
+        # Fedoras acpid package includes a power.sh script that breaks the power button behavior
+        # The script has not been updated in 6 years either and is not included on other distros
+        # -> it's safe to remove it.
+        rmfile("/etc/acpi/actions/power.sh")
         bash("systemctl enable acpid")
         bash(f"systemctl --machine={username}@.host --user --now enable avs-auto-switcher")
 
@@ -437,20 +441,10 @@ if __name__ == "__main__":
         match boards[device_board]:
             case "bsw":
                 bsw_audio()
-            case "skl":
+            case "skl" | "kbl" | "apl":
                 avs_audio(device_board, user_id)
-            case "kbl":
-                avs_audio(device_board, user_id)
-            case "apl":
-                apl_audio(device_board, user_id)
-            case "glk":
-                sof_audio("glk")
-            case "cml":
-                sof_audio("cml")
-            case "jsl":
-                sof_audio("jsl")
-            case "tgl":
-                sof_audio("tgl")
+            case "glk" | "cml" | "jsl" | "tgl":
+                sof_audio(boards[device_board])
             case "str":
                 print_error("StoneyRidge is not supported!")
                 exit(0)
