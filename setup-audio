@@ -164,6 +164,7 @@ def sof_audio(platform):
         case "jsl":
             cpdir(f"{config_path}/audio/sof/ucms/jsl/sof-rt5682", "/usr/share/alsa/ucm2/conf.d/sof-rt5682")
             cpdir(f"{config_path}/audio/sof/ucms/jsl/sof-da7219max98", "/usr/share/alsa/ucm2/conf.d/sof-da7219max98")
+            cpdir(f"{config_path}/audio/sof/ucms/jsl/sof-cs42l42", "/usr/share/alsa/ucm2/conf.d/sof-cs42l42")
             # JSL needs proprietary topology from ChromeOS
             extract_blobs("jsl")
 
