@@ -445,8 +445,10 @@ if __name__ == "__main__":
         match boards[device_board]:
             case "bsw":
                 bsw_audio()
-            case "skl" | "kbl" | "apl":
+            case "skl" | "kbl":
                 avs_audio(device_board, user_id)
+            case "apl":
+                apl_audio(device_board, user_id)
             case "glk" | "cml" | "jsl" | "tgl":
                 sof_audio(boards[device_board])
             case "str":
