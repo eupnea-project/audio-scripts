@@ -171,6 +171,9 @@ def sof_audio(platform):
     # Common dmic split ucm
     cpdir(f"{config_path}/audio/sof/ucms/dmic-common", "/usr/share/alsa/ucm2/conf.d/dmic-common")
 
+    # Common hdmi configurations
+    cpdir(f"{config_path}/audio/sof/ucms/hdmi-common", "/usr/share/alsa/ucm2/conf.d/hdmi-common")
+
 
 def bsw_audio():
     print_status("Fixing braswell audio")
