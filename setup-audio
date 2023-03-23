@@ -104,6 +104,8 @@ def apl_audio(board, username):
             # Remove avs modprobe config if it exists
             rmfile("/etc/modprobe.d/snd-avs.conf")
             sof_audio("apl")
+            # Install apl specific modprobe config
+            cpfile(f"{config_path}/audio/sof/apl-sof.conf", "/etc/modprobe.d/apl-sof.conf")
             print_status("Important: After rebooting you will need to enable the audio output device!")
             break
         elif user_input.lower() == "avs":
