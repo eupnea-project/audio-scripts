@@ -73,6 +73,7 @@ def avs_audio(board, username):
     if not path_exists(f"/lib/modules/{bash('uname -r')}/kernel/sound/soc/intel/avs"):
         print_error("Looks like your kernel doesn't have the avs modules. Make sure you are on atlest 6.0 with avs "
                     "enabled. If you are on a Eupnea Project kernel update your system.")
+        exit(0)
 
     # Service for automatically switching between speakers and headphones
     user_input = input("Would you like to install the automatic speaker and headphone switching service? (Y/n)").lower()
