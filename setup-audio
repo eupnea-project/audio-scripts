@@ -179,7 +179,7 @@ def sof_audio(platform):
 
 
 def bsw_audio():
-    print_status("Fixing braswell audio")
+    print_status("Fixing braswell/baytrail audio")
     cpfile(f"{config_path}/audio/sof/bsw-sof.conf", "/etc/modprobe.d/bsw-sof.conf")
 
 
@@ -449,7 +449,7 @@ if __name__ == "__main__":
 
     try:
         match boards[device_board]:
-            case "bsw":
+            case "byt" | "bsw":
                 bsw_audio()
             case "skl" | "kbl":
                 avs_audio(device_board, user_id)
