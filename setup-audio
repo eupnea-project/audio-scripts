@@ -372,7 +372,7 @@ def update_system() -> None:
 if __name__ == "__main__":
     # Determine if running from a git clone or a eupnea system
     if sys.argv[0] == "/usr/bin/setup-audio":
-        config_path = "/etc/eupnea"
+        config_path = "/usr/share/eupnea"
         sys.path.insert(0, "/usr/lib/eupnea")
     else:
         config_path = "configs"
