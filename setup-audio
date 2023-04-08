@@ -49,6 +49,11 @@ def avs_audio(board, username):
     cpdir(f"{config_path}/audio/avs/tplg", "/lib/firmware/intel/avs")
     cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
 
+    # Install wireplumber config for dmic if wireplumber is installed on the system
+    if path_exists("/usr/bin/wireplumber"):
+        mkdir("/etc/wireplumber/main.lua.d/", create_parents=True)
+        cpfile(f"{config_path}/audio/avs/51-avs-dmic.lua", "/etc/wireplumber/main.lua.d/51-avs-dmic.lua")
+
     # TODO: Remove when upstream packages get updated
     # avs dsp firmware recently got merged upstream but is not packaged in any distro yet
     mkdir("/lib/firmware/intel/avs/skl")
