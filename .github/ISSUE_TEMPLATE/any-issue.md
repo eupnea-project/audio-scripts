@@ -18,7 +18,7 @@ A clear and concise description of what the bug is.
  - Running EupneaOS/Depthboot [yes/no]:
 
 **logs**
-<!-- If you are using EupneaOS/Depthboot, run `collectl-logs` and upload the tar here. Otherwise leave this empty -->
+<!-- If you are using EupneaOS/Depthboot, run `collect-logs` and upload the tar here. Otherwise leave this empty -->
 
 **Additional context**
 Add any other context about the problem here.
