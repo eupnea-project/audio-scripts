@@ -81,7 +81,7 @@ def avs_audio(board, username):
         exit(0)
 
     # Service for automatically switching between speakers and headphones
-    user_input = input("Would you like to install the automatic speaker and headphone switching service? (Y/n)").lower()
+    user_input = input("Would you like to install the automatic speaker and headphone switching service? (Y/n) ").lower()
     if user_input != "n":
         cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher", "/usr/local/bin/avs-auto-switcher")
         bash("chmod +x /usr/local/bin/avs-auto-switcher")  # TODO: figure out why this isn't executable by default
