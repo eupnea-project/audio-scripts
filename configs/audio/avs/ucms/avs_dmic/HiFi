@@ -8,17 +8,34 @@ SectionVerb {
 	]
 }
 
-SectionDevice."Internal Mic" {
-	Comment "Internal Microphone"
-
-	Value {
-		CapturePCM "hw:avsdmic,2"
-		CaptureChannels 4
-		CaptureChannelMap "0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1"
-		IntrinsicSensitivity "-2600"
+If.4ch {
+	Condition {
+		Type String
+		Haystack "${sys:devices/virtual/dmi/id/bios_version}"
+		Needle "Google"
 	}
-	EnableSequence [
-	]
-	DisableSequence [
-	]
+	True {
+		SectionDevice."Internal Mic" {
+			Comment "Internal Microphone"
+
+			Value {
+				CapturePCM "hw:avsdmic,2"
+				CaptureChannels 4
+				CaptureChannelMap "0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1"
+				IntrinsicSensitivity "-2600"
+			}
+		}
+	}
+	False {
+		SectionDevice."Internal Mic" {
+			Comment "Internal Microphone"
+
+			Value {
+				CapturePCM "hw:avsdmic,2"
+				CaptureChannels 2
+				CaptureChannelMap "0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1"
+				IntrinsicSensitivity "-2600"
+			}
+		}
+	}
 }

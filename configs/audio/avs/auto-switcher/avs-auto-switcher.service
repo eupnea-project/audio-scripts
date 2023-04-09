@@ -1,7 +1,7 @@
 [Unit]
 Description=Automatically switch between avs headphones and speakers
 PartOf=graphical-session.target
-After=graphical-session.target
+After=pulseaudio.socket pipewire-pulse.socket
 
 [Service]
 ExecStart=/usr/local/bin/avs-auto-switcher
