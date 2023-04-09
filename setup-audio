@@ -49,6 +49,13 @@ def avs_audio(board, username):
     cpdir(f"{config_path}/audio/avs/tplg", "/lib/firmware/intel/avs")
     cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
 
+    # Install wireplumber on Ubuntu 22.04
+    with open("/etc/os-release", "r") as file:
+        os_release = file.read().lower()
+    if "ubuntu 22.04" in os_release:
+        install_package(deb_package="wireplumber")
+
+
     # Install wireplumber config for dmic if wireplumber is installed on the system
     if path_exists("/usr/bin/wireplumber"):
         mkdir("/etc/wireplumber/main.lua.d/", create_parents=True)
