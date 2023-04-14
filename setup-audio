@@ -105,7 +105,7 @@ def avs_audio(board, username):
 
 def apl_audio(board, username):
     print_status("Apollolake has two audio drivers:")
-    print_status("SOF: Stable but doesn't work with headphones or mic.")
+    print_status("SOF: Stable but doesn't work with headphones.")
     print_status("AVS: Unstable and can cause damage to speakers but supports all audio hardware.")
     print_error("NOTE: Speakers are disabled on AVS as a safety precaution. (use --force-avs-install to override)"
                 "Your speakers will still work on SOF though.")
@@ -119,7 +119,6 @@ def apl_audio(board, username):
             sof_audio("apl")
             # Install apl specific modprobe config
             cpfile(f"{config_path}/audio/sof/apl-sof.conf", "/etc/modprobe.d/apl-sof.conf")
-            print_status("Important: After rebooting you will need to enable the audio output device!")
             break
         elif user_input.lower() == "avs":
             print_status("Using avs")
@@ -152,6 +151,8 @@ def sof_audio(platform):
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
 
     match platform:
+        case "apl":
+            cpdir(f"{config_path}/audio/sof/ucms/apl/sof-bxtda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-bxtda7219ma")
         case "glk":
             # Most glk devices use da7219/max98357a
             cpdir(f"{config_path}/audio/sof/ucms/glk/sof-glkda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-glkda7219ma")
