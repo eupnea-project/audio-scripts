@@ -22,6 +22,7 @@ jobs:
         run: |
           # eupnea ucms
           cp -r ucm-configs/avs/* configs/audio/avs/ucms/
+          cp -r ucm-configs/apl/* configs/audio/sof/ucms/apl/
           cp -r ucm-configs/cml/* configs/audio/sof/ucms/cml/
           cp -r ucm-configs/glk/* configs/audio/sof/ucms/glk/
           cp -r ucm-configs/jsl/* configs/audio/sof/ucms/jsl/
