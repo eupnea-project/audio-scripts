@@ -27,6 +27,7 @@ jobs:
           cp -r ucm-configs/glk/* configs/audio/sof/ucms/glk/
           cp -r ucm-configs/jsl/* configs/audio/sof/ucms/jsl/
           cp -r ucm-configs/tgl/* configs/audio/sof/ucms/tgl/
+          cp -r ucm-configs/adl/* configs/audio/sof/ucms/adl/
           cp -r ucm-configs/dmic-common configs/audio/avs/ucms/
           cp -r ucm-configs/dmic-common configs/audio/sof/ucms/
           cp -r ucm-configs/hdmi-common configs/audio/sof/ucms/
