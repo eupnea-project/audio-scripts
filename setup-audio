@@ -185,6 +185,8 @@ def sof_audio(platform):
 
 def bsw_audio():
     print_status("Fixing braswell/baytrail audio")
+    install_package("alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm-conf")
+    install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "sof-firmware", "sof-firmware")
     cpfile(f"{config_path}/audio/sof/bsw-sof.conf", "/etc/modprobe.d/bsw-sof.conf")
 
 
