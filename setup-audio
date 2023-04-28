@@ -292,7 +292,7 @@ def install_package(arch_package: str = "", deb_package: str = "", rpm_package: 
 # Some devices need special firmware files for speakers to work, which is proprietary and non-redistributable
 # -> extract it locally from a ChromeOS recovery image
 def extract_blobs(platform) -> None:
-    if platform not in ["rammus", "nocturne", "jsl"]:
+    if platform not in ["rammus", "nocturne"]:
         return
     print_question("Your device needs special firmware files for speakers to work which needs to be extracted from a "
                    "ChromeOS recovery image. The recovery image is about 2GB in size. You will need about 6GB of free"
@@ -313,9 +313,6 @@ def extract_blobs(platform) -> None:
         if platform == "rammus":
             download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_rammus_recovery_"
                           "stable-channel_mp-v2.bin.zip", "/var/tmp/recovery.bin.zip")
-        elif platform == "jsl":
-            download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_dedede_recovery_stable"
-                          "-channel_mp-v27.bin.zip", "/var/tmp/recovery.bin.zip")
         else:  # nocturne
             download_file("https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15278.64.0_nocturne_"
                           "recovery_stable-channel_mp.bin.zip", "/var/tmp/recovery.bin.zip")
@@ -329,15 +326,8 @@ def extract_blobs(platform) -> None:
         bash(f"mount {loop_dev}p3 /mnt/chromeos-recovery -o ro")
 
         print_status("Extracting firmware")
-        if platform == "jsl":
-            # Remove old topology
-            rmfile("/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg")
-            # Install new topology
-            cpfile("/mnt/chromeos-recovery/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg",
-                   "/lib/firmware/intel/sof-tplg/sof-jsl-rt5682-rt1015.tplg")
-        else:  # rammus and nocturne
-            # extract avs firmware
-            cpdir("/mnt/chromeos-recovery/lib/firmware/intel/avs", "/lib/firmware/intel/avs")
+        # extract avs firmware
+        cpdir("/mnt/chromeos-recovery/lib/firmware/intel/avs", "/lib/firmware/intel/avs")
 
         # extract dsm config
         if platform == "rammus":
