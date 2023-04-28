@@ -43,25 +43,31 @@ def avs_audio(board, username):
         override_avs = False
 
     # Copy ucms
+    print_status("Installing UCM configuration")
     cpdir(f"{config_path}/audio/avs/ucms", "/usr/share/alsa/ucm2/conf.d/")
 
     # avs tplg is from https://github.com/thesofproject/avs-topology-xml
+    print_status("Installing topology")
     cpdir(f"{config_path}/audio/avs/tplg", "/lib/firmware/intel/avs")
+    print_status("Installing modprobe config")
     cpfile(f"{config_path}/audio/avs/snd-avs.conf", "/etc/modprobe.d/snd-avs.conf")
 
     # Install wireplumber on Ubuntu 22.04
     with open("/etc/os-release", "r") as file:
         os_release = file.read().lower()
     if "ubuntu 22.04" in os_release:
+        print_status("Installing wireplumber")
         install_package(deb_package="wireplumber")
 
     # Install wireplumber config for dmic if wireplumber is installed on the system
     if path_exists("/usr/bin/wireplumber"):
+        print_status("Installing wireplumber config (fixes internal mic)")
         mkdir("/etc/wireplumber/main.lua.d/", create_parents=True)
         cpfile(f"{config_path}/audio/avs/51-avs-dmic.lua", "/etc/wireplumber/main.lua.d/51-avs-dmic.lua")
 
     # TODO: Remove when upstream packages get updated
     # avs dsp firmware recently got merged upstream but is not packaged in any distro yet
+    print_status("Installing AVS firmware")
     mkdir("/lib/firmware/intel/avs/skl")
     mkdir("/lib/firmware/intel/avs/apl")
     urlretrieve("https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/intel/avs/apl/"
@@ -90,10 +96,12 @@ def avs_audio(board, username):
     user_input = input("Would you like to install the automatic speaker and headphone "
                        "switching service? (Y/n) ").lower()
     if user_input != "n":
+        print_status("Installing auto switcher")
         cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher", "/usr/local/bin/avs-auto-switcher")
         bash("chmod +x /usr/local/bin/avs-auto-switcher")  # TODO: figure out why this isn't executable by default
         cpfile(f"{config_path}/audio/avs/auto-switcher/avs-auto-switcher.service",
                "/usr/lib/systemd/user/avs-auto-switcher.service")
+        print_status("Installing deps")
         install_package("acpid", "acpid", "acpid", "acpid", "acpid")
         # Fedoras acpid package includes a power.sh script that breaks the power button behavior
         # The script has not been updated in 6 years either and is not included on other distros
@@ -136,6 +144,7 @@ def sof_audio(platform):
 
     # Install required packages
     # Sof firmware needs to be reinstalled for some reason.
+    print_status("Installing SOF firmware")
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "sof-firmware", "sof-firmware",
                     reinstall=True)
     # linux-firmware has different names on ubuntu and debian
@@ -148,8 +157,10 @@ def sof_audio(platform):
     install_package("alsa-utils", "alsa-utils", "alsa-utils", "alsa-utils", "alsa-utils")
 
     # Force sof driver
+    print_status("Installing modprobe config")
     cpfile(f"{config_path}/audio/sof/alsa-sof.conf", "/etc/modprobe.d/alsa-sof.conf")
-
+    
+    print_status("Installing UCM configuration")
     match platform:
         case "apl":
             cpdir(f"{config_path}/audio/sof/ucms/apl/sof-bxtda7219ma", "/usr/share/alsa/ucm2/conf.d/sof-bxtda7219ma")
