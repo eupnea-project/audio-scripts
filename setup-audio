@@ -20,27 +20,29 @@ def process_args():
 
 def avs_audio(board, username):
     print_status("Installing AVS")
-    if args.force_avs_install:
-        print_error(
-            "WARNING: AVS is unstable and can cause permanent damage to your speakers if your device has max98357a!")
-        user_input = input('Type "I understand the risk of permanently damaging my speakers" in all caps to continue: ')
-        while user_input != "I UNDERSTAND THE RISK OF PERMANENTLY DAMAGING MY SPEAKERS":
-            user_input = input(
-                'Type "I understand the risk of permanently damaging my speakers" in all caps to continue: ')
-        override_avs = True
-    else:
-        print_error(
-            "WARNING: AVS is unstable and can cause permanent damage to your speakers if your device has max98357a! "
-            "As a safety precaution devices with max98357a have speakers disabled until a fix is in place. "
-            "Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
-        print_question("If you want to disable this check, restart the script with --force-avs-install")
+    # Only show the warning to devices with max98357a
+    if path_exists("/sys/bus/acpi/devices/MX98357A:00"):
+        if args.force_avs_install:
+            print_error(
+                "WARNING: AVS is unstable and can cause permanent damage to your speakers if your device has max98357a!")
+            user_input = input('Type "I understand the risk of permanently damaging my speakers" in all caps to continue: ')
+            while user_input != "I UNDERSTAND THE RISK OF PERMANENTLY DAMAGING MY SPEAKERS":
+                user_input = input(
+                    'Type "I understand the risk of permanently damaging my speakers" in all caps to continue: ')
+            override_avs = True
+        else:
+            print_error(
+                "WARNING: AVS is unstable and can cause permanent damage to your speakers if your device has max98357a! "
+                "As a safety precaution devices with max98357a have speakers disabled until a fix is in place. "
+                "Headphones and HDMI audio are safe from this. If the driver crashes reboot to fix it.")
+            print_question("If you want to disable this check, restart the script with --force-avs-install")
 
-        user_input = input(
-            'Type "I Understand my speakers will not work if my device has max98357a!" in all caps to continue: ')
-        while user_input != "I UNDERSTAND MY SPEAKERS WILL NOT WORK IF MY DEVICE HAS MAX98357A!":
             user_input = input(
                 'Type "I Understand my speakers will not work if my device has max98357a!" in all caps to continue: ')
-        override_avs = False
+            while user_input != "I UNDERSTAND MY SPEAKERS WILL NOT WORK IF MY DEVICE HAS MAX98357A!":
+                user_input = input(
+                    'Type "I Understand my speakers will not work if my device has max98357a!" in all caps to continue: ')
+            override_avs = False
 
     # Copy ucms
     print_status("Installing UCM configuration")
