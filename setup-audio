@@ -21,6 +21,7 @@ def process_args():
 def avs_audio(board, username):
     print_status("Installing AVS")
     # Only show the warning to devices with max98357a
+    override_avs = False
     if path_exists("/sys/bus/acpi/devices/MX98357A:00"):
         if args.force_avs_install:
             print_error(
