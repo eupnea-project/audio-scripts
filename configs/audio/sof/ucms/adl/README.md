@@ -5,3 +5,4 @@
 * sof-rt5682:
     * Banshee: Original files [here](https://github.com/eupnea-linux/ucm-configs/tree/main/upstream/brya/banshee/sof-rt5682.banshee).
     * Felwinter: Original files [here](https://github.com/eupnea-linux/ucm-configs/tree/main/upstream/brya/felwinter).
+    * Taniks: Original files [here](https://github.com/eupnea-linux/ucm-configs/tree/main/upstream/brya/taniks/sof-rt5682.taniks).
