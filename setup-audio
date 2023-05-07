@@ -110,8 +110,12 @@ def avs_audio(board, username):
         # The script has not been updated in 6 years either and is not included on other distros
         # -> it's safe to remove it.
         rmfile("/etc/acpi/actions/power.sh")
-        bash("systemctl enable acpid")
-        bash(f"systemctl --machine={username}@.host --user --now enable avs-auto-switcher")
+        if path_exists("/usr/bin/systemctl"):
+            bash("systemctl enable acpid")
+            bash(f"systemctl --machine={username}@.host --user --now enable avs-auto-switcher")
+        else:
+            print_warning("Warning: You are running a non-systemd distro. "
+                          "You will need to manually start the acpid and avs-auto-switcher services")
 
 
 def apl_audio(board, username):
