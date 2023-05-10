@@ -13,12 +13,25 @@ def process_args():
                         help="Print more output")
     parser.add_argument("-b", dest="board_name", type=str, nargs=1, default=[""],
                         help="Override board name. FOR TESTING ONLY")
+    parser.add_argument("--enable-debug", action='store_const', const="Enabling", dest="debug",
+                        help="Enable audio debugging.")
+    parser.add_argument("--disable-debug", action='store_const', const="Disabling", dest="debug",
+                        help="Disable audio debugging.")
     parser.add_argument("--force-avs-install", action="store_true", dest="force_avs_install", default=False,
                         help="DANGEROUS: Force enable AVS install. MIGHT CAUSE PERMANENT DAMAGE TO SPEAKERS!")
     return parser.parse_args()
 
 
 def avs_audio(board, username):
+    if debug:
+        print_status(f"{debug} AVS debugging")
+        if debug == "Enabling":
+            cpfile(f"{config_path}/audio/avs/snd-avs-dbg.conf", "/etc/modprobe.d/snd-avs-dbg.conf")
+        else:
+            rmfile("/etc/modprobe.d/snd-avs-dbg.conf")
+        print_status("Done, please reboot for changes to take effect.")
+        exit()
+
     print_status("Installing AVS")
     # Only show the warning to devices with max98357a
     override_avs = False
@@ -147,6 +160,15 @@ def apl_audio(board, username):
 
 
 def sof_audio(platform):
+    if debug:
+        print_status(f"{debug} SOF debugging")
+        if debug == "Enabling":
+            cpfile(f"{config_path}/audio/sof/alsa-sof-dbg.conf", "/etc/modprobe.d/alsa-sof-dbg.conf")
+        else:
+            rmfile("/etc/modprobe.d/alsa-sof-dbg.conf")
+        print_status("Done, please reboot for changes to take effect.")
+        exit()
+
     print_status("Installing SOF")
 
     # Install required packages
@@ -202,6 +224,15 @@ def sof_audio(platform):
 
 
 def bsw_audio():
+    if debug:
+        print_status(f"{debug} SOF BSW debugging")
+        if debug == "Enabling":
+            cpfile(f"{config_path}/audio/avs/bsw-sof-dbg.conf", "/etc/modprobe.d/bsw-sof-dbg.conf")
+        else:
+            rmfile("/etc/modprobe.d/bsw-sof-dbg.conf")
+        print_status("Done, please reboot for changes to take effect.")
+        exit()
+
     print_status("Fixing braswell/baytrail audio")
     install_package("alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm-conf", "alsa-ucm-conf")
     install_package("sof-firmware", "firmware-sof-signed", "alsa-sof-firmware", "sof-firmware", "sof-firmware")
