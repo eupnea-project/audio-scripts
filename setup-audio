@@ -23,7 +23,7 @@ def process_args():
 
 
 def avs_audio(board, username):
-    if debug:
+    if args.debug:
         print_status(f"{debug} AVS debugging")
         if debug == "Enabling":
             cpfile(f"{config_path}/audio/avs/snd-avs-dbg.conf", "/etc/modprobe.d/snd-avs-dbg.conf")
@@ -160,7 +160,7 @@ def apl_audio(board, username):
 
 
 def sof_audio(platform):
-    if debug:
+    if args.debug:
         print_status(f"{debug} SOF debugging")
         if debug == "Enabling":
             cpfile(f"{config_path}/audio/sof/alsa-sof-dbg.conf", "/etc/modprobe.d/alsa-sof-dbg.conf")
@@ -224,7 +224,7 @@ def sof_audio(platform):
 
 
 def bsw_audio():
-    if debug:
+    if args.debug:
         print_status(f"{debug} SOF BSW debugging")
         if debug == "Enabling":
             cpfile(f"{config_path}/audio/avs/bsw-sof-dbg.conf", "/etc/modprobe.d/bsw-sof-dbg.conf")
