@@ -24,6 +24,17 @@ If.4ch {
 				CaptureChannelMap "0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1"
 				IntrinsicSensitivity "-2600"
 			}
+			If.dspvol {
+				Condition {
+					Type ControlExists
+					Control "name='DMIC FE DMIC Volume'"
+				}
+				True {
+					EnableSequence [
+						cset "name='DMIC FE DMIC Volume' 2147483647"
+					]
+				}
+			}
 		}
 	}
 	False {
@@ -35,6 +46,17 @@ If.4ch {
 				CaptureChannels 2
 				CaptureChannelMap "0 0 -1 -1 -1 -1 -1 -1 -1 -1 -1"
 				IntrinsicSensitivity "-2600"
+			}
+			If.dspvol {
+				Condition {
+					Type ControlExists
+					Control "name='DMIC FE DMIC Volume'"
+				}
+				True {
+					EnableSequence [
+						cset "name='DMIC FE DMIC Volume' 2147483647"
+					]
+				}
 			}
 		}
 	}
