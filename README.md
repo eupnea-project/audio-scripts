@@ -1,3 +1,10 @@
+# THIS REPO HAS BEEN DISCONTINUED
+
+Please use the [new repo](https://github.com/WeirdTreeThing/chromebook-linux-audio) instead.
+
+<details>
+<summary>View the old readme</summary>
+
 <h1 align="center">Setup audio on Chromebooks</h1>
 
 # Instructions
